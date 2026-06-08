@@ -20,9 +20,11 @@ export function PixelFrame({
   style,
   ...rest
 }: PixelFrameProps) {
-  const frameStyle: CSSProperties & Record<string, string> = { ...style };
-  if (frame) frameStyle["--frame"] = frame;
-  if (surface) frameStyle["--surface"] = surface;
+  const frameStyle = {
+    ...style,
+    ...(frame ? { "--frame": frame } : {}),
+    ...(surface ? { "--surface": surface } : {}),
+  } as CSSProperties;
 
   return (
     <div
