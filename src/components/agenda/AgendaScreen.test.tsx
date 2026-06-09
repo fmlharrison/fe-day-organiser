@@ -89,11 +89,11 @@ describe("AgendaScreen", () => {
       expect(screen.getByText("Closing")).toBeInTheDocument();
     });
 
-    it("renders exactly 15 timeline rows", () => {
+    it("renders exactly 16 timeline rows", () => {
       const { container } = render(
         <AgendaScreen user={user} signOutAction={noop} />,
       );
-      expect(container.querySelectorAll(".ag-row")).toHaveLength(15);
+      expect(container.querySelectorAll(".ag-row")).toHaveLength(16);
     });
 
     it("renders one timeline row per agenda entry", () => {

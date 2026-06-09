@@ -50,13 +50,14 @@ describe("TYPE_BY_ID", () => {
 });
 
 describe("AGENDA", () => {
-  it("has exactly fifteen rows", () => {
-    expect(AGENDA).toHaveLength(15);
+  it("has exactly sixteen rows", () => {
+    expect(AGENDA).toHaveLength(16);
   });
 
-  it("runs from 10:00 to 16:55", () => {
+  it("runs from 10:00 through to the evening social", () => {
     expect(AGENDA[0].t).toBe("10:00");
-    expect(AGENDA.at(-1)?.end).toBe("16:55");
+    expect(AGENDA.at(-1)?.t).toBe("17:00");
+    expect(AGENDA.at(-1)?.title).toBe("Social");
   });
 
   it("is chronological and non-overlapping, with one intentional gap", () => {
@@ -66,8 +67,8 @@ describe("AGENDA", () => {
       expect(AGENDA[i].end <= AGENDA[i + 1].t).toBe(true);
       if (AGENDA[i].end !== AGENDA[i + 1].t) gaps++;
     }
-    // The only non-contiguous boundary is the 12:25 -> 12:30 pre-lunch buffer.
-    expect(gaps).toBe(1);
+    // Non-contiguous boundaries: 12:25 -> 12:30 pre-lunch buffer, 16:55 -> 17:00 post-closing.
+    expect(gaps).toBe(2);
   });
 
   it("keeps a 5-minute buffer before lunch", () => {
@@ -91,9 +92,10 @@ describe("AGENDA", () => {
     const workshopIndex = AGENDA.findIndex((row) => row.kind === "workshop");
     const afternoonBreakIndex = AGENDA.findIndex((row) => row.title === "Afternoon Break");
     expect(workshopIndex).toBeGreaterThan(afternoonBreakIndex);
-    // Only the closing follows the workshop.
-    expect(workshopIndex).toBe(AGENDA.length - 2);
-    expect(AGENDA.at(-1)?.kind).toBe("fixed");
+    // Closing and the evening social follow the workshop.
+    expect(workshopIndex).toBe(AGENDA.length - 3);
+    expect(AGENDA.at(-2)?.title).toBe("Closing");
+    expect(AGENDA.at(-1)?.title).toBe("Social");
   });
 
   it("includes Joe Angus's State of the FE session and drops show & tell", () => {

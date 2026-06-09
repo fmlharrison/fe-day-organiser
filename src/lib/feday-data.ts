@@ -68,7 +68,8 @@ export const AGENDA: {
   { t: "15:20", end: "15:30", kind: "lightning", title: "Lightning Slot #4", desc: "Last spark before the break." },
   { t: "15:30", end: "15:45", kind: "break", title: "Afternoon Break", desc: "A 15-minute refuel before the home stretch." },
   { t: "15:45", end: "16:45", kind: "workshop", title: "Workshop", desc: "60 minutes, hands on deck — the whole chapter builds something together." },
-  { t: "16:45", end: "16:55", kind: "fixed", title: "Closing", desc: "Wrap-up, thank-yous and quick-fire FE Day awards. Then: socials." },
+  { t: "16:45", end: "16:55", kind: "fixed", title: "Closing", desc: "Wrap-up, thank-yous and quick-fire FE Day awards." },
+  { t: "17:00", end: "TBC", kind: "fixed", title: "Social", desc: "Location and details TBC — stick around after closing for drinks, chat and celebrating the day." },
 ];
 
 export const KIND_META: Record<
