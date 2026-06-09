@@ -34,3 +34,11 @@ export const ATTENDANCE_MODE_IDS = ATTENDANCE_MODES.map((m) => m.id);
 export function isAttendanceMode(value: string): value is AttendanceMode {
   return (ATTENDANCE_MODE_IDS as string[]).includes(value);
 }
+
+export function formatAttendanceMode(mode: AttendanceMode): string {
+  return ATTENDANCE_MODES.find((m) => m.id === mode)?.name ?? mode;
+}
+
+export function attendanceModeColor(mode: AttendanceMode): string {
+  return ATTENDANCE_MODES.find((m) => m.id === mode)?.color ?? "var(--ink-dim)";
+}

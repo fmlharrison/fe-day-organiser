@@ -30,6 +30,16 @@ export async function getAttendanceForUser(userId: string): Promise<AttendanceRe
   return data ? mapAttendanceRow(data as AttendanceRow) : null;
 }
 
+export async function getAllAttendance(): Promise<AttendanceRecord[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("event_attendance")
+    .select("user_id, attendee_name, attendee_email, mode, updated_at")
+    .order("attendee_name", { ascending: true });
+
+  return (data ?? []).map((row) => mapAttendanceRow(row as AttendanceRow));
+}
+
 export async function getAttendanceCounts(): Promise<AttendanceCounts> {
   const supabase = await createClient();
   const { data } = await supabase.from("event_attendance").select("mode");

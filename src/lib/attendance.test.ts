@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { ATTENDANCE_MODE_IDS, isAttendanceMode } from "@/lib/attendance";
+import {
+  ATTENDANCE_MODE_IDS,
+  attendanceModeColor,
+  formatAttendanceMode,
+  isAttendanceMode,
+} from "@/lib/attendance";
 
 describe("attendance", () => {
   describe("isAttendanceMode", () => {
@@ -17,6 +22,20 @@ describe("attendance", () => {
       for (const id of ATTENDANCE_MODE_IDS) {
         expect(isAttendanceMode(id)).toBe(true);
       }
+    });
+  });
+
+  describe("formatAttendanceMode", () => {
+    it("maps modes to display labels", () => {
+      expect(formatAttendanceMode("in_person")).toBe("IN PERSON");
+      expect(formatAttendanceMode("remote")).toBe("REMOTE");
+    });
+  });
+
+  describe("attendanceModeColor", () => {
+    it("returns a theme color for each mode", () => {
+      expect(attendanceModeColor("in_person")).toBe("var(--teal)");
+      expect(attendanceModeColor("remote")).toBe("var(--gold)");
     });
   });
 });
