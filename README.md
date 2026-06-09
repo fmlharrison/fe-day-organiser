@@ -18,7 +18,7 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
 | `/agenda` | signed-in | The FE Day running order |
 | `/pitch` | signed-in | Pitch a talk (open agenda slots deep-link here via `?type=`) |
 | `/my-pitches` | signed-in | Your own submissions |
-| `/admin` | organisers only | All submissions, with submitter details |
+| `/admin` | organisers only | All submissions, assign talks to agenda slots |
 
 ## Prerequisites
 
@@ -33,9 +33,9 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
    pnpm install
    ```
 2. **Create a Supabase project** at supabase.com.
-3. **Apply the schema.** Run [`supabase/migrations/0001_talk_submissions.sql`](supabase/migrations/0001_talk_submissions.sql)
-   in the Supabase SQL editor (or via the Supabase CLI). It creates the `talk_submissions`
-   and `organisers` tables with Row Level Security, and seeds `felix@meetcleo.com` as an organiser.
+3. **Apply the schema.** Run the SQL migrations in order in the Supabase SQL editor (or via the Supabase CLI):
+   - [`supabase/migrations/0001_talk_submissions.sql`](supabase/migrations/0001_talk_submissions.sql) — submissions + organisers
+   - [`supabase/migrations/0002_agenda_assignments.sql`](supabase/migrations/0002_agenda_assignments.sql) — slot assignments for the agenda
 4. **Enable Google auth.** In Supabase: *Authentication → Providers → Google*. Create a Google
    OAuth client in the Google Cloud Console, set its authorized redirect URI to
    `https://<your-project-ref>.supabase.co/auth/v1/callback`, and paste the client ID/secret
@@ -52,7 +52,7 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
 
 ## Adding organisers
 
-Organisers see every submission at `/admin`. Grant access by inserting into `organisers`:
+Organisers see every submission at `/admin` and can confirm pitches into open agenda slots. Grant access by inserting into `organisers`:
 
 ```sql
 insert into public.organisers (email) values ('someone@meetcleo.com');
