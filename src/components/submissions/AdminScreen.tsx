@@ -1,7 +1,9 @@
 import { TopBar } from "@/components/agenda/TopBar";
+import { AdminAttendanceList } from "@/components/submissions/AdminAttendanceList";
 import { AdminSubmissionList } from "@/components/submissions/AdminSubmissionList";
 import type { SessionUser } from "@/lib/auth/user";
 import type { AssignedTalk } from "@/lib/agenda";
+import type { AttendanceCounts, AttendanceRecord } from "@/lib/attendance";
 import type { TalkSubmissionRow } from "@/lib/submissions";
 import { OPEN_AGENDA_SLOTS } from "@/lib/feday-data";
 import { getRemainingOpenSlotCount } from "@/lib/agenda";
@@ -12,6 +14,8 @@ type AdminScreenProps = {
   submissions: TalkSubmissionRow[];
   assignmentsBySlot: Record<string, AssignedTalk>;
   assignmentsBySubmission: Record<string, AssignedTalk>;
+  attendees?: AttendanceRecord[];
+  attendanceCounts?: AttendanceCounts;
 };
 
 export function AdminScreen({
@@ -20,6 +24,8 @@ export function AdminScreen({
   submissions,
   assignmentsBySlot,
   assignmentsBySubmission,
+  attendees = [],
+  attendanceCounts = { inPerson: 0, remote: 0, total: 0 },
 }: AdminScreenProps) {
   const takenSlotIds = new Set(Object.keys(assignmentsBySlot));
   const remainingOpen = getRemainingOpenSlotCount(assignmentsBySlot);
@@ -47,6 +53,29 @@ export function AdminScreen({
           />
         ) : (
           <div className="txt">No pitches submitted yet.</div>
+        )}
+
+        <div className="pdiv" style={{ margin: "40px 0 28px" }} />
+
+        <h2
+          style={{
+            fontSize: "clamp(22px,4vw,32px)",
+            color: "var(--teal)",
+            textShadow: "3px 3px 0 var(--shadow)",
+            marginBottom: 12,
+          }}
+        >
+          ATTENDEES
+        </h2>
+        <div className="txt-sm" style={{ marginBottom: 26 }}>
+          {attendanceCounts.inPerson} in person · {attendanceCounts.remote} remote ·{" "}
+          {attendanceCounts.total} RSVP'd
+        </div>
+
+        {attendees.length > 0 ? (
+          <AdminAttendanceList attendees={attendees} />
+        ) : (
+          <div className="txt">No one has RSVP'd yet.</div>
         )}
       </div>
     </div>

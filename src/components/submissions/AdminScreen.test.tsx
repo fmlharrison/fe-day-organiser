@@ -114,4 +114,62 @@ describe("AdminScreen", () => {
       expect(screen.queryByText(/bea@meetcleo\.com/)).toBeNull();
     });
   });
+
+  describe("attendees", () => {
+    const attendees = [
+      {
+        userId: "u1",
+        attendeeName: "Ada Pixel",
+        attendeeEmail: "ada@meetcleo.com",
+        mode: "in_person" as const,
+        updatedAt: "2026-06-01T10:00:00.000Z",
+      },
+      {
+        userId: "u2",
+        attendeeName: "Bea Byte",
+        attendeeEmail: "bea@meetcleo.com",
+        mode: "remote" as const,
+        updatedAt: "2026-06-02T10:00:00.000Z",
+      },
+    ];
+
+    it("shows the attendees section with headcount", () => {
+      render(
+        <AdminScreen
+          user={user}
+          signOutAction={noop}
+          submissions={rows}
+          {...emptyAssignments}
+          attendees={attendees}
+          attendanceCounts={{ inPerson: 1, remote: 1, total: 2 }}
+        />,
+      );
+      expect(screen.getByRole("heading", { name: /ATTENDEES/i })).toBeInTheDocument();
+      expect(screen.getByText(/1 in person · 1 remote · 2 RSVP'd/i)).toBeInTheDocument();
+    });
+
+    it("lists attendee names and modes", () => {
+      render(
+        <AdminScreen
+          user={user}
+          signOutAction={noop}
+          submissions={rows}
+          {...emptyAssignments}
+          attendees={attendees}
+          attendanceCounts={{ inPerson: 1, remote: 1, total: 2 }}
+        />,
+      );
+      expect(screen.getByText("Ada Pixel")).toBeInTheDocument();
+      expect(screen.getByText("Bea Byte")).toBeInTheDocument();
+      expect(screen.getByText("IN PERSON")).toBeInTheDocument();
+      expect(screen.getByText("REMOTE")).toBeInTheDocument();
+    });
+
+    it("shows an empty state when nobody has RSVP'd", () => {
+      render(
+        <AdminScreen user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
+      );
+      expect(screen.getByText(/No one has RSVP'd yet/i)).toBeInTheDocument();
+    });
+  });
 });
