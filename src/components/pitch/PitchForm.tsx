@@ -172,7 +172,7 @@ export function PitchForm({ userName, presetType, submitAction }: PitchFormProps
             </div>
           )}
           <Btn variant="orange lg" type="submit" disabled={submitting}>
-            SUBMIT IDEA ▶
+            SUBMIT IDEA {'>'}
           </Btn>
         </div>
       </form>

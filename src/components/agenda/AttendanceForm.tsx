@@ -100,7 +100,7 @@ export function AttendanceForm({ attendance, counts, setAttendanceAction }: Atte
             onClick={handleSubmit}
             style={{ marginLeft: "auto" }}
           >
-            {savedMode ? (hasChanged ? "UPDATE RSVP ▶" : "RSVP SAVED ✓") : "COUNT ME IN ▶"}
+            {savedMode ? (hasChanged ? "UPDATE RSVP {'>'}" : "RSVP SAVED ✓") : "COUNT ME IN {'>'}"}
           </Btn>
         </div>
       </div>

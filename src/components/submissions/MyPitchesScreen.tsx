@@ -56,7 +56,7 @@ export function MyPitchesScreen({
           <div className="row" style={{ gap: 18, flexWrap: "wrap" }}>
             <div className="txt">No pitches in the queue yet.</div>
             <Link href="/pitch" className="btn orange">
-              PITCH AN IDEA ▶
+              PITCH AN IDEA {'>'}
             </Link>
           </div>
         )}
