@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AgendaScreen } from "@/components/agenda/AgendaScreen";
 import { AGENDA, KIND_META } from "@/lib/feday-data";
@@ -55,6 +55,25 @@ describe("AgendaScreen", () => {
       expect(chipLabels).toEqual(
         expect.arrayContaining(["LIGHTNING TALK", "LONG TALK", "WORKSHOP", "BREAK"]),
       );
+    });
+  });
+
+  describe("attendance", () => {
+    it("does not show the RSVP block without a setAttendanceAction", () => {
+      render(<AgendaScreen user={user} signOutAction={noop} />);
+      expect(screen.queryByText(/PRESS START TO RSVP/i)).toBeNull();
+    });
+
+    it("shows the RSVP block when setAttendanceAction is provided", () => {
+      render(
+        <AgendaScreen
+          user={user}
+          signOutAction={noop}
+          setAttendanceAction={vi.fn()}
+          attendanceCounts={{ inPerson: 1, remote: 0, total: 1 }}
+        />,
+      );
+      expect(screen.getByText(/PRESS START TO RSVP/i)).toBeInTheDocument();
     });
   });
 

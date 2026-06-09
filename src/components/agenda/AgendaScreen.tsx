@@ -7,13 +7,23 @@ import { AGENDA, KIND_META, OPEN_AGENDA_SLOTS, TALK_TYPES } from "@/lib/feday-da
 import type { AssignedTalk } from "@/lib/agenda";
 import { getRemainingOpenSlotCount, resolveAgendaRow } from "@/lib/agenda";
 import type { SessionUser } from "@/lib/auth/user";
+import type {
+  AttendanceCounts,
+  AttendanceMode,
+  AttendanceRecord,
+} from "@/lib/attendance";
+import type { AttendanceResult } from "@/app/agenda/actions";
 import { TopBar } from "@/components/agenda/TopBar";
+import { AttendanceForm } from "@/components/agenda/AttendanceForm";
 
 type AgendaScreenProps = {
   user: SessionUser;
   isOrganiser?: boolean;
   signOutAction: () => void | Promise<void>;
   assignmentsBySlot?: Record<string, AssignedTalk>;
+  attendance?: AttendanceRecord | null;
+  attendanceCounts?: AttendanceCounts;
+  setAttendanceAction?: (mode: AttendanceMode) => Promise<AttendanceResult>;
 };
 
 export function AgendaScreen({
@@ -21,6 +31,9 @@ export function AgendaScreen({
   isOrganiser,
   signOutAction,
   assignmentsBySlot = {},
+  attendance = null,
+  attendanceCounts = { inPerson: 0, remote: 0, total: 0 },
+  setAttendanceAction,
 }: AgendaScreenProps) {
   const firstName = user.name.split(/\s+/)[0]?.toUpperCase();
   const remainingOpen = getRemainingOpenSlotCount(assignmentsBySlot);
@@ -45,6 +58,14 @@ export function AgendaScreen({
           <Stat k="TIME" v="10:00–17:00" />
           <Stat k="WHERE" v="LION'S SHARE + REMOTE" />
         </div>
+
+        {setAttendanceAction && (
+          <AttendanceForm
+            attendance={attendance}
+            counts={attendanceCounts}
+            setAttendanceAction={setAttendanceAction}
+          />
+        )}
 
         <div className="row" style={{ gap: 10, flexWrap: "wrap", margin: "20px 0 30px" }}>
           {TALK_TYPES.map((t) => (
