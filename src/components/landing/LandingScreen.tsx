@@ -49,7 +49,7 @@ export function LandingScreen({ error, signInAction }: LandingScreenProps) {
         </div>
 
         <div className="pixel blink" style={{ fontSize: 14, color: "var(--ink)", marginBottom: 22 }}>
-          ▶ PRESS START
+          {'>'} PRESS START
         </div>
 
         <div className="stack" style={{ gap: 14, alignItems: "center" }}>

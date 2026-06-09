@@ -51,7 +51,7 @@ export function SuccessModal({ submission, onClose }: SuccessModalProps) {
               We’ll slot it into the running order and shout when it’s confirmed. Pitch another any time.
             </div>
             <Link href="/agenda" className="btn teal">
-              ◀ BACK TO AGENDA
+              {'<'} BACK TO AGENDA
             </Link>
           </div>
         </PixelFrame>

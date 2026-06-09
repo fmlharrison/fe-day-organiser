@@ -70,7 +70,7 @@ export function PitchForm({ userName, presetType, submitAction }: PitchFormProps
           className="pixel"
           style={{ display: "inline-block", color: "var(--teal)", fontSize: 11, marginBottom: 16 }}
         >
-          ◀ BACK TO AGENDA
+          {'<'} BACK TO AGENDA
         </Link>
         <h1 style={{ fontSize: "clamp(24px,5vw,38px)", color: "var(--gold)", textShadow: "4px 4px 0 var(--shadow)" }}>
           PITCH A TALK
