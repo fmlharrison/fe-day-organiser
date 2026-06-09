@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { FE_DAY, TALK_TYPES, TYPE_BY_ID, AGENDA, KIND_META } from "@/lib/feday-data";
+import { FE_DAY, TALK_TYPES, TYPE_BY_ID, AGENDA, KIND_META, OPEN_AGENDA_SLOTS, SLOT_BY_ID, getOpenSlotsForType } from "@/lib/feday-data";
 
 describe("FE_DAY", () => {
   it("exposes the event identity", () => {
@@ -23,7 +23,7 @@ describe("TALK_TYPES", () => {
   });
 
   it("names each type", () => {
-    expect(TALK_TYPES.map((t) => t.name)).toEqual(["LIGHTNING", "LONG TALK", "WORKSHOP"]);
+    expect(TALK_TYPES.map((t) => t.name)).toEqual(["LIGHTNING TALK", "LONG TALK", "WORKSHOP"]);
   });
 
   it("uses the canonical durations", () => {
@@ -136,5 +136,29 @@ describe("KIND_META", () => {
     expect(KIND_META.workshop.label).toBe("WORKSHOP");
     expect(KIND_META.break.label).toBe("BREAK");
     expect(KIND_META.fixed.label).toBe("SESSION");
+  });
+});
+
+describe("open agenda slots", () => {
+  it("gives every open row a unique stable id", () => {
+    const openRows = AGENDA.filter((row) => KIND_META[row.kind].open);
+    expect(OPEN_AGENDA_SLOTS).toHaveLength(openRows.length);
+    const ids = OPEN_AGENDA_SLOTS.map((row) => row.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    for (const row of openRows) {
+      expect(row.id).toBeTruthy();
+    }
+  });
+
+  it("maps ids through SLOT_BY_ID", () => {
+    for (const row of OPEN_AGENDA_SLOTS) {
+      expect(SLOT_BY_ID[row.id]).toBe(row);
+    }
+  });
+
+  it("matches open slot kinds to getOpenSlotsForType", () => {
+    expect(getOpenSlotsForType("talk")).toHaveLength(4);
+    expect(getOpenSlotsForType("lightning")).toHaveLength(4);
+    expect(getOpenSlotsForType("workshop")).toHaveLength(1);
   });
 });
