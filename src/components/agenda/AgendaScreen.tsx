@@ -55,7 +55,7 @@ export function AgendaScreen({ user, isOrganiser, signOutAction }: AgendaScreenP
               </div>
             </div>
             <Link href="/pitch" className="btn orange">
-              SUBMIT A TALK IDEA ▶
+              SUBMIT A TALK IDEA {'>'}
             </Link>
           </div>
         </PixelFrame>
@@ -67,8 +67,7 @@ export function AgendaScreen({ user, isOrganiser, signOutAction }: AgendaScreenP
             return (
               <div className="ag-row" key={i}>
                 <div className="ag-time">
-                  {row.t}
-                  <br />
+                  <span>{row.t}</span>
                   <span style={{ color: "var(--ink-dim)" }}>{row.end}</span>
                 </div>
                 <div className="ag-rail">
@@ -83,7 +82,7 @@ export function AgendaScreen({ user, isOrganiser, signOutAction }: AgendaScreenP
                   <div className="ag-desc">{row.desc}</div>
                   {meta.open && (
                     <Link href={`/pitch?type=${row.kind}`} className="ag-open">
-                      ▶ OPEN SLOT — CLAIM IT
+                      OPEN SLOT — CLAIM IT
                     </Link>
                   )}
                 </div>
