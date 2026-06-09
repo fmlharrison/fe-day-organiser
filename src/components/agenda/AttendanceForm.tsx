@@ -6,6 +6,8 @@ import { PixelFrame } from "@/components/ui/PixelFrame";
 import { Btn } from "@/components/ui/Btn";
 import {
   ATTENDANCE_MODES,
+  attendanceModeColor,
+  formatAttendanceMode,
   type AttendanceCounts,
   type AttendanceMode,
   type AttendanceRecord,
@@ -18,13 +20,10 @@ type AttendanceFormProps = {
   setAttendanceAction: (mode: AttendanceMode) => Promise<AttendanceResult>;
 };
 
-function modeLabel(mode: AttendanceMode): string {
-  return mode === "in_person" ? "IN PERSON" : "REMOTE";
-}
-
 export function AttendanceForm({ attendance, counts, setAttendanceAction }: AttendanceFormProps) {
   const [selected, setSelected] = useState<AttendanceMode | "">(attendance?.mode ?? "");
   const [savedMode, setSavedMode] = useState<AttendanceMode | null>(attendance?.mode ?? null);
+  const [editing, setEditing] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -39,11 +38,48 @@ export function AttendanceForm({ attendance, counts, setAttendanceAction }: Atte
     const result = await setAttendanceAction(selected);
     if (result.ok) {
       setSavedMode(result.mode);
+      setEditing(false);
     } else {
       setFormError(result.formError);
     }
     setSubmitting(false);
   };
+
+  if (savedMode && !editing) {
+    const color = attendanceModeColor(savedMode);
+    return (
+      <div
+        className="row between"
+        style={{
+          gap: 12,
+          flexWrap: "wrap",
+          marginBottom: 34,
+          padding: "14px 18px",
+          border: "3px solid var(--teal)",
+          background: "var(--bg-2)",
+          boxShadow: "4px 4px 0 var(--shadow)",
+        }}
+      >
+        <div className="row" style={{ gap: 10, alignItems: "center" }}>
+          <span className="sw" style={{ background: color, width: 12, height: 12, flexShrink: 0 }} />
+          <span className="txt-sm">
+            You&apos;re attending — <strong style={{ color }}>{formatAttendanceMode(savedMode)}</strong>
+          </span>
+        </div>
+        <button
+          type="button"
+          className="btn ghost sm"
+          onClick={() => {
+            setSelected(savedMode);
+            setEditing(true);
+            setFormError(null);
+          }}
+        >
+          CHANGE
+        </button>
+      </div>
+    );
+  }
 
   const hasChanged = selected !== "" && selected !== savedMode;
 
@@ -52,11 +88,11 @@ export function AttendanceForm({ attendance, counts, setAttendanceAction }: Atte
       <div className="stack" style={{ gap: 18 }}>
         <div>
           <h3 style={{ fontSize: 14, color: "var(--teal)", marginBottom: 10 }}>
-            {savedMode ? "YOU'RE ON THE GUEST LIST" : "PRESS START TO RSVP"}
+            {savedMode ? "UPDATE YOUR RSVP" : "PRESS START TO RSVP"}
           </h3>
           <div className="txt" style={{ fontSize: 20 }}>
             {savedMode
-              ? `Locked in as ${modeLabel(savedMode)}. Changed your mind? Pick a new option below.`
+              ? "Pick how you're joining FE Day."
               : "Let the chapter know you're coming — in the room or on the stream."}
           </div>
           {counts.total > 0 && (
@@ -93,14 +129,27 @@ export function AttendanceForm({ attendance, counts, setAttendanceAction }: Atte
               {formError}
             </div>
           )}
+          {savedMode && (
+            <button
+              type="button"
+              className="btn ghost sm"
+              onClick={() => {
+                setEditing(false);
+                setSelected(savedMode);
+                setFormError(null);
+              }}
+            >
+              CANCEL
+            </button>
+          )}
           <Btn
             variant="teal lg"
             type="button"
-            disabled={submitting || !selected || (!hasChanged && savedMode !== null)}
+            disabled={submitting || !selected || (savedMode !== null && !hasChanged)}
             onClick={handleSubmit}
             style={{ marginLeft: "auto" }}
           >
-            {savedMode ? (hasChanged ? "UPDATE RSVP >" : "RSVP SAVED ✓") : "COUNT ME IN >"}
+            {savedMode ? "UPDATE RSVP >" : "COUNT ME IN >"}
           </Btn>
         </div>
       </div>
