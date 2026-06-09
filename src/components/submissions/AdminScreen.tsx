@@ -1,15 +1,30 @@
 import { TopBar } from "@/components/agenda/TopBar";
-import { SubmissionList } from "@/components/submissions/SubmissionList";
+import { AdminSubmissionList } from "@/components/submissions/AdminSubmissionList";
 import type { SessionUser } from "@/lib/auth/user";
+import type { AssignedTalk } from "@/lib/agenda";
 import type { TalkSubmissionRow } from "@/lib/submissions";
+import { OPEN_AGENDA_SLOTS } from "@/lib/feday-data";
+import { getRemainingOpenSlotCount } from "@/lib/agenda";
 
 type AdminScreenProps = {
   user: SessionUser;
   signOutAction: () => void | Promise<void>;
   submissions: TalkSubmissionRow[];
+  assignmentsBySlot: Record<string, AssignedTalk>;
+  assignmentsBySubmission: Record<string, AssignedTalk>;
 };
 
-export function AdminScreen({ user, signOutAction, submissions }: AdminScreenProps) {
+export function AdminScreen({
+  user,
+  signOutAction,
+  submissions,
+  assignmentsBySlot,
+  assignmentsBySubmission,
+}: AdminScreenProps) {
+  const takenSlotIds = new Set(Object.keys(assignmentsBySlot));
+  const remainingOpen = getRemainingOpenSlotCount(assignmentsBySlot);
+  const assignedCount = OPEN_AGENDA_SLOTS.length - remainingOpen;
+
   return (
     <div>
       <TopBar user={user} isOrganiser={true} signOutAction={signOutAction} />
@@ -21,11 +36,15 @@ export function AdminScreen({ user, signOutAction, submissions }: AdminScreenPro
           ALL PITCHES
         </h1>
         <div className="txt-sm" style={{ marginBottom: 26 }}>
-          {submissions.length} submitted
+          {submissions.length} submitted · {assignedCount} on the agenda · {remainingOpen} open slots left
         </div>
 
         {submissions.length > 0 ? (
-          <SubmissionList submissions={submissions} showSubmitter={true} />
+          <AdminSubmissionList
+            submissions={submissions}
+            assignmentsBySubmission={assignmentsBySubmission}
+            takenSlotIds={takenSlotIds}
+          />
         ) : (
           <div className="txt">No pitches submitted yet.</div>
         )}
