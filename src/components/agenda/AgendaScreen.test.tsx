@@ -53,7 +53,7 @@ describe("AgendaScreen", () => {
         (c) => c.textContent,
       );
       expect(chipLabels).toEqual(
-        expect.arrayContaining(["LIGHTNING", "LONG TALK", "WORKSHOP", "BREAK"]),
+        expect.arrayContaining(["LIGHTNING TALK", "LONG TALK", "WORKSHOP", "BREAK"]),
       );
     });
   });
@@ -128,9 +128,54 @@ describe("AgendaScreen", () => {
       const claimLinks = screen.getAllByRole("link", {
         name: /OPEN SLOT — CLAIM IT/i,
       });
-      // 9 open rows in AGENDA: 4 lightning + 4 talk + 1 workshop.
-      // Breaks and fixed sessions are not claimable.
       expect(claimLinks).toHaveLength(openRows.length);
+    });
+
+    it("shows assigned talk title and speaker instead of the placeholder", () => {
+      render(
+        <AgendaScreen
+          user={user}
+          signOutAction={noop}
+          assignmentsBySlot={{
+            "talk-1": {
+              slotId: "talk-1",
+              submissionId: "sub-1",
+              title: "Deleting 40% Of Our CSS",
+              description: "A story about shipping less CSS.",
+              submitterName: "Ada Pixel",
+              team: "Web Platform",
+              type: "talk",
+            },
+          }}
+        />,
+      );
+      expect(screen.getByText("Deleting 40% Of Our CSS")).toBeInTheDocument();
+      expect(screen.getByText(/Ada Pixel, Web Platform/)).toBeInTheDocument();
+      expect(screen.queryByText("Talk Slot #1")).toBeNull();
+    });
+
+    it("hides the claim link on a filled slot", () => {
+      render(
+        <AgendaScreen
+          user={user}
+          signOutAction={noop}
+          assignmentsBySlot={{
+            "talk-1": {
+              slotId: "talk-1",
+              submissionId: "sub-1",
+              title: "Deleting 40% Of Our CSS",
+              description: "A story about shipping less CSS.",
+              submitterName: "Ada Pixel",
+              team: "Web Platform",
+              type: "talk",
+            },
+          }}
+        />,
+      );
+      const claimLinks = screen.queryAllByRole("link", {
+        name: /OPEN SLOT — CLAIM IT/i,
+      });
+      expect(claimLinks).toHaveLength(openRows.length - 1);
     });
   });
 });

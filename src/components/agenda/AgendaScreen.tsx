@@ -3,7 +3,9 @@ import Link from "next/link";
 import { PixelFrame } from "@/components/ui/PixelFrame";
 import { Chip } from "@/components/ui/Chip";
 import { Stat } from "@/components/ui/Stat";
-import { AGENDA, KIND_META, TALK_TYPES } from "@/lib/feday-data";
+import { AGENDA, KIND_META, OPEN_AGENDA_SLOTS, TALK_TYPES } from "@/lib/feday-data";
+import type { AssignedTalk } from "@/lib/agenda";
+import { getRemainingOpenSlotCount, resolveAgendaRow } from "@/lib/agenda";
 import type { SessionUser } from "@/lib/auth/user";
 import { TopBar } from "@/components/agenda/TopBar";
 
@@ -11,10 +13,17 @@ type AgendaScreenProps = {
   user: SessionUser;
   isOrganiser?: boolean;
   signOutAction: () => void | Promise<void>;
+  assignmentsBySlot?: Record<string, AssignedTalk>;
 };
 
-export function AgendaScreen({ user, isOrganiser, signOutAction }: AgendaScreenProps) {
+export function AgendaScreen({
+  user,
+  isOrganiser,
+  signOutAction,
+  assignmentsBySlot = {},
+}: AgendaScreenProps) {
   const firstName = user.name.split(/\s+/)[0]?.toUpperCase();
+  const remainingOpen = getRemainingOpenSlotCount(assignmentsBySlot);
 
   return (
     <div>
@@ -49,14 +58,20 @@ export function AgendaScreen({ user, isOrganiser, signOutAction }: AgendaScreenP
         <PixelFrame frame="var(--orange)" surface="var(--bg-2)" style={{ marginBottom: 34 }} pad={22}>
           <div className="row between" style={{ gap: 18, flexWrap: "wrap" }}>
             <div style={{ maxWidth: 460 }}>
-              <h3 style={{ fontSize: 14, color: "var(--orange)", marginBottom: 10 }}>OPEN SLOTS NEED YOU</h3>
+              <h3 style={{ fontSize: 14, color: "var(--orange)", marginBottom: 10 }}>
+                {remainingOpen > 0 ? "OPEN SLOTS NEED YOU" : "AGENDA LOCKED IN"}
+              </h3>
               <div className="txt" style={{ fontSize: 20 }}>
-                The talk, lightning &amp; workshop slots below are wide open. Grab one — pitch the thing you’ve been dying to share.
+                {remainingOpen > 0
+                  ? `${remainingOpen} of ${OPEN_AGENDA_SLOTS.length} talk slots still open. Grab one — pitch the thing you’ve been dying to share.`
+                  : "Every talk, lightning and workshop slot is filled. See you on the day!"}
               </div>
             </div>
-            <Link href="/pitch" className="btn orange">
-              SUBMIT A TALK IDEA {'>'}
-            </Link>
+            {remainingOpen > 0 && (
+              <Link href="/pitch" className="btn orange">
+                SUBMIT A TALK IDEA {'>'}
+              </Link>
+            )}
           </div>
         </PixelFrame>
 
@@ -64,8 +79,10 @@ export function AgendaScreen({ user, isOrganiser, signOutAction }: AgendaScreenP
           {AGENDA.map((row, i) => {
             const meta = KIND_META[row.kind];
             const isLast = i === AGENDA.length - 1;
+            const assignment = row.id ? assignmentsBySlot[row.id] : undefined;
+            const resolved = resolveAgendaRow(row, assignment, meta.open);
             return (
-              <div className="ag-row" key={i}>
+              <div className="ag-row" key={row.id ?? i}>
                 <div className="ag-time">
                   <span>{row.t}</span>
                   <span style={{ color: "var(--ink-dim)" }}>{row.end}</span>
@@ -78,9 +95,14 @@ export function AgendaScreen({ user, isOrganiser, signOutAction }: AgendaScreenP
                   <span className="ag-tag" style={{ "--type-color": meta.color } as CSSProperties}>
                     {meta.label}
                   </span>
-                  <div className="ag-title">{row.title}</div>
-                  <div className="ag-desc">{row.desc}</div>
-                  {meta.open && (
+                  <div className="ag-title">{resolved.title}</div>
+                  <div className="ag-desc">{resolved.desc}</div>
+                  {resolved.speaker && (
+                    <div className="txt-sm" style={{ marginTop: 10 }}>
+                      — {resolved.speaker}
+                    </div>
+                  )}
+                  {resolved.showClaimLink && (
                     <Link href={`/pitch?type=${row.kind}`} className="ag-open">
                       OPEN SLOT — CLAIM IT
                     </Link>
