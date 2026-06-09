@@ -84,8 +84,9 @@ describe("AgendaScreen", () => {
     it("renders some recognisable fixed-point sessions", () => {
       render(<AgendaScreen user={user} signOutAction={noop} />);
       expect(screen.getByText("Doors Open + Ice Breaker")).toBeInTheDocument();
+      expect(screen.getByText("The State of the FE at Cleo")).toBeInTheDocument();
       expect(screen.getByText("Lunch")).toBeInTheDocument();
-      expect(screen.getByText("Closing + FE Day Awards")).toBeInTheDocument();
+      expect(screen.getByText("Closing")).toBeInTheDocument();
     });
 
     it("renders exactly 15 timeline rows", () => {
