@@ -42,3 +42,12 @@ export function formatAttendanceMode(mode: AttendanceMode): string {
 export function attendanceModeColor(mode: AttendanceMode): string {
   return ATTENDANCE_MODES.find((m) => m.id === mode)?.color ?? "var(--ink-dim)";
 }
+
+export function partitionAttendees(
+  attendees: AttendanceRecord[],
+  currentUserId: string,
+): { mine: AttendanceRecord | null; others: AttendanceRecord[] } {
+  const mine = attendees.find((a) => a.userId === currentUserId) ?? null;
+  const others = attendees.filter((a) => a.userId !== currentUserId);
+  return { mine, others };
+}
