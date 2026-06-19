@@ -18,6 +18,7 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
 | `/agenda` | signed-in | The FE Day running order |
 | `/pitch` | signed-in | Pitch a talk (open agenda slots deep-link here via `?type=`) |
 | `/my-pitches` | signed-in | Your own submissions |
+| `/attendees` | signed-in | RSVP + who's coming to FE Day |
 | `/admin` | organisers only | All submissions, assign talks to agenda slots |
 
 ## Prerequisites

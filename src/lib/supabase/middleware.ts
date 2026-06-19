@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { isAllowedEmail } from "@/lib/auth/domain";
 
-const PROTECTED_PATHS = ["/agenda", "/pitch", "/my-pitches", "/admin"];
+const PROTECTED_PATHS = ["/agenda", "/pitch", "/my-pitches", "/attendees", "/admin"];
 
 function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PATHS.some(
