@@ -75,6 +75,19 @@ describe("AgendaScreen", () => {
       );
       expect(screen.getByText(/PRESS START TO RSVP/i)).toBeInTheDocument();
     });
+
+    it("links to the attendees screen when the RSVP block is shown", () => {
+      render(
+        <AgendaScreen
+          user={user}
+          signOutAction={noop}
+          setAttendanceAction={vi.fn()}
+          attendanceCounts={{ inPerson: 1, remote: 0, total: 1 }}
+        />,
+      );
+      const link = screen.getByRole("link", { name: /SEE WHO'S COMING/i });
+      expect(link).toHaveAttribute("href", "/attendees");
+    });
   });
 
   describe("call to action", () => {

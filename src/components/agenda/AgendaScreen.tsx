@@ -12,7 +12,7 @@ import type {
   AttendanceMode,
   AttendanceRecord,
 } from "@/lib/attendance";
-import type { AttendanceResult } from "@/app/agenda/actions";
+import type { AttendanceResult } from "@/app/attendees/actions";
 import { TopBar } from "@/components/agenda/TopBar";
 import { AttendanceForm } from "@/components/agenda/AttendanceForm";
 
@@ -60,11 +60,18 @@ export function AgendaScreen({
         </div>
 
         {setAttendanceAction && (
-          <AttendanceForm
-            attendance={attendance}
-            counts={attendanceCounts}
-            setAttendanceAction={setAttendanceAction}
-          />
+          <>
+            <AttendanceForm
+              attendance={attendance}
+              counts={attendanceCounts}
+              setAttendanceAction={setAttendanceAction}
+            />
+            <div style={{ marginTop: -22, marginBottom: 34 }}>
+              <Link href="/attendees" className="txt-sm" style={{ color: "var(--teal)" }}>
+                SEE WHO&apos;S COMING {'>'}
+              </Link>
+            </div>
+          </>
         )}
 
         <div className="row" style={{ gap: 10, flexWrap: "wrap", margin: "20px 0 30px" }}>

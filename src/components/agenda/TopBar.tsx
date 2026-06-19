@@ -33,6 +33,9 @@ export function TopBar({ user, isOrganiser, signOutAction }: TopBarProps) {
         <Link href="/my-pitches" className="btn ghost sm">
           MY PITCHES
         </Link>
+        <Link href="/attendees" className="btn ghost sm">
+          WHO&apos;S IN
+        </Link>
         {isOrganiser && (
           <Link href="/admin" className="btn ghost sm">
             ADMIN
