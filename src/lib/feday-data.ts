@@ -72,7 +72,7 @@ export const AGENDA: AgendaRow[] = [
   { t: "15:30", end: "15:45", kind: "break", title: "Afternoon Break", desc: "A 15-minute refuel before the home stretch." },
   { id: "workshop-1", t: "15:45", end: "16:45", kind: "workshop", title: "Workshop", desc: "60 minutes, hands on deck — the whole chapter builds something together." },
   { t: "16:45", end: "16:55", kind: "fixed", title: "Closing", desc: "Wrap-up, thank-yous and quick-fire FE Day awards." },
-  { t: "17:00", end: "TBC", kind: "fixed", title: "Social", desc: "Location and details TBC — stick around after closing for drinks, chat and celebrating the day." },
+  { t: "18:00", end: "20:00", kind: "fixed", title: "Social — Bowling @ All Star Lanes", desc: "Brick Lane, 6–8pm. A game of bowling, 2 drinks each and some nibbles — head over after closing wraps up." },
 ];
 
 export const OPEN_AGENDA_SLOTS = AGENDA.filter(

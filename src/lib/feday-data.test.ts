@@ -56,8 +56,8 @@ describe("AGENDA", () => {
 
   it("runs from 10:00 through to the evening social", () => {
     expect(AGENDA[0].t).toBe("10:00");
-    expect(AGENDA.at(-1)?.t).toBe("17:00");
-    expect(AGENDA.at(-1)?.title).toBe("Social");
+    expect(AGENDA.at(-1)?.t).toBe("18:00");
+    expect(AGENDA.at(-1)?.title).toBe("Social — Bowling @ All Star Lanes");
   });
 
   it("is chronological and non-overlapping, with one intentional gap", () => {
@@ -67,7 +67,7 @@ describe("AGENDA", () => {
       expect(AGENDA[i].end <= AGENDA[i + 1].t).toBe(true);
       if (AGENDA[i].end !== AGENDA[i + 1].t) gaps++;
     }
-    // Non-contiguous boundaries: 12:25 -> 12:30 pre-lunch buffer, 16:55 -> 17:00 post-closing.
+    // Non-contiguous boundaries: 12:25 -> 12:30 pre-lunch buffer, 16:55 -> 18:00 post-closing.
     expect(gaps).toBe(2);
   });
 
@@ -95,7 +95,7 @@ describe("AGENDA", () => {
     // Closing and the evening social follow the workshop.
     expect(workshopIndex).toBe(AGENDA.length - 3);
     expect(AGENDA.at(-2)?.title).toBe("Closing");
-    expect(AGENDA.at(-1)?.title).toBe("Social");
+    expect(AGENDA.at(-1)?.title).toBe("Social — Bowling @ All Star Lanes");
   });
 
   it("includes Joe Angus's State of the FE session and drops show & tell", () => {
