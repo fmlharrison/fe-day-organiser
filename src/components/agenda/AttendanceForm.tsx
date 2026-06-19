@@ -12,7 +12,7 @@ import {
   type AttendanceMode,
   type AttendanceRecord,
 } from "@/lib/attendance";
-import type { AttendanceResult } from "@/app/agenda/actions";
+import type { AttendanceResult } from "@/app/attendees/actions";
 
 type AttendanceFormProps = {
   attendance: AttendanceRecord | null;

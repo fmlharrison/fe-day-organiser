@@ -1,5 +1,5 @@
 import { AgendaScreen } from "@/components/agenda/AgendaScreen";
-import { setAttendance } from "@/app/agenda/actions";
+import { setAttendance } from "@/app/attendees/actions";
 import { signOut } from "@/app/auth/actions";
 import { requireUser } from "@/lib/auth/user";
 import { getAttendanceCounts, getAttendanceForUser } from "@/lib/attendance.server";
