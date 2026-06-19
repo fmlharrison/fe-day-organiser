@@ -15,16 +15,32 @@ describe("TopBar", () => {
   });
 
   describe("primary navigation", () => {
-    it("links to /pitch from a 'pitch a talk' control", () => {
+    it("links to /agenda from an agenda control", () => {
       render(<TopBar user={user} signOutAction={noop} />);
-      const link = screen.getByRole("link", { name: /pitch a talk/i });
-      expect(link.getAttribute("href")).toBe("/pitch");
+      const link = screen.getByRole("link", { name: /^agenda$/i });
+      expect(link.getAttribute("href")).toBe("/agenda");
     });
 
-    it("links to /my-pitches from a 'my pitches' control", () => {
+    it("links to /attendees from a who's in control", () => {
+      render(<TopBar user={user} signOutAction={noop} />);
+      const link = screen.getByRole("link", { name: /who's in/i });
+      expect(link.getAttribute("href")).toBe("/attendees");
+    });
+
+    it("links to /my-pitches from a my pitches control", () => {
       render(<TopBar user={user} signOutAction={noop} />);
       const link = screen.getByRole("link", { name: /my pitches/i });
       expect(link.getAttribute("href")).toBe("/my-pitches");
+    });
+
+    it("orders nav links as agenda, who's in, then my pitches", () => {
+      render(<TopBar user={user} signOutAction={noop} />);
+      const agenda = screen.getByRole("link", { name: "AGENDA" });
+      const whosIn = screen.getByRole("link", { name: "WHO'S IN" });
+      const myPitches = screen.getByRole("link", { name: "MY PITCHES" });
+
+      expect(agenda.compareDocumentPosition(whosIn) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(whosIn.compareDocumentPosition(myPitches) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });
   });
 

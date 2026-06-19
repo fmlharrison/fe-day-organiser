@@ -27,14 +27,14 @@ export function TopBar({ user, isOrganiser, signOutAction }: TopBarProps) {
         FE DAY ’26
       </Link>
       <div className="row" style={{ gap: 14 }}>
-        <Link href="/pitch" className="btn orange sm">
-          + PITCH A TALK
-        </Link>
-        <Link href="/my-pitches" className="btn ghost sm">
-          MY PITCHES
+        <Link href="/agenda" className="btn ghost sm">
+          AGENDA
         </Link>
         <Link href="/attendees" className="btn ghost sm">
           WHO&apos;S IN
+        </Link>
+        <Link href="/my-pitches" className="btn ghost sm">
+          MY PITCHES
         </Link>
         {isOrganiser && (
           <Link href="/admin" className="btn ghost sm">
