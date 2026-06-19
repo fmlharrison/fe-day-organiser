@@ -37,6 +37,7 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
    - [`supabase/migrations/0001_talk_submissions.sql`](supabase/migrations/0001_talk_submissions.sql) — submissions + organisers
    - [`supabase/migrations/0002_agenda_assignments.sql`](supabase/migrations/0002_agenda_assignments.sql) — slot assignments for the agenda
    - [`supabase/migrations/0003_event_attendance.sql`](supabase/migrations/0003_event_attendance.sql) — in-person / remote RSVPs
+   - [`supabase/migrations/0004_assigned_submissions_read.sql`](supabase/migrations/0004_assigned_submissions_read.sql) — let attendees read talks on the agenda
 4. **Enable Google auth.** In Supabase: *Authentication → Providers → Google*. Create a Google
    OAuth client in the Google Cloud Console, set its authorized redirect URI to
    `https://<your-project-ref>.supabase.co/auth/v1/callback`, and paste the client ID/secret
