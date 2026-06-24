@@ -35,10 +35,14 @@ describe("validateSubmission", () => {
     it.each([
       ["lightning"],
       ["talk"],
-      ["workshop"],
     ])("accepts the known type %s", (type) => {
       const errors = validateSubmission(withField({ type }));
       expect(errors).not.toHaveProperty("type");
+    });
+
+    it("rejects workshop pitches", () => {
+      const errors = validateSubmission(withField({ type: "workshop" }));
+      expect(errors).toHaveProperty("type");
     });
 
     it.each([

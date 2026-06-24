@@ -3,6 +3,7 @@ import {
   resolveAgendaRow,
   validateAssignment,
   getRemainingOpenSlotCount,
+  getOrphanedAssignments,
 } from "@/lib/agenda";
 import { AGENDA, OPEN_AGENDA_SLOTS, getOpenSlotsForType } from "@/lib/feday-data";
 import type { AssignedTalk } from "@/lib/agenda";
@@ -56,6 +57,16 @@ describe("validateAssignment", () => {
     expect(result).toEqual({ ok: false, formError: "That agenda slot doesn't exist." });
   });
 
+  it("rejects legacy slot ids", () => {
+    const result = validateAssignment({
+      slotId: "workshop-1",
+      submissionId: "sub-1",
+      submissionType: "workshop",
+      assignmentsBySlot: {},
+    });
+    expect(result).toEqual({ ok: false, formError: "That agenda slot is no longer available." });
+  });
+
   it("rejects type mismatches", () => {
     const result = validateAssignment({
       slotId: "talk-1",
@@ -105,23 +116,42 @@ describe("getRemainingOpenSlotCount", () => {
     expect(getRemainingOpenSlotCount({})).toBe(OPEN_AGENDA_SLOTS.length);
   });
 
-  it("subtracts filled slots from the open total", () => {
+  it("subtracts filled open slots from the open total", () => {
     expect(getRemainingOpenSlotCount({ "talk-1": sampleAssignment })).toBe(
       OPEN_AGENDA_SLOTS.length - 1,
     );
   });
+
+  it("ignores assignments to legacy slots", () => {
+    expect(
+      getRemainingOpenSlotCount({
+        "workshop-1": { ...sampleAssignment, slotId: "workshop-1", type: "workshop" },
+      }),
+    ).toBe(OPEN_AGENDA_SLOTS.length);
+  });
+});
+
+describe("getOrphanedAssignments", () => {
+  it("returns assignments on retired slot ids", () => {
+    const orphaned = getOrphanedAssignments({
+      "talk-1": sampleAssignment,
+      "talk-4": { ...sampleAssignment, slotId: "talk-4", submissionId: "sub-2" },
+    });
+    expect(orphaned).toHaveLength(1);
+    expect(orphaned[0]?.slotId).toBe("talk-4");
+  });
 });
 
 describe("getOpenSlotsForType", () => {
-  it("returns four talk slots", () => {
-    expect(getOpenSlotsForType("talk")).toHaveLength(4);
+  it("returns three talk slots", () => {
+    expect(getOpenSlotsForType("talk")).toHaveLength(3);
   });
 
-  it("returns four lightning slots", () => {
-    expect(getOpenSlotsForType("lightning")).toHaveLength(4);
+  it("returns three lightning slots", () => {
+    expect(getOpenSlotsForType("lightning")).toHaveLength(3);
   });
 
-  it("returns one workshop slot", () => {
-    expect(getOpenSlotsForType("workshop")).toHaveLength(1);
+  it("returns no workshop slots", () => {
+    expect(getOpenSlotsForType("workshop")).toHaveLength(0);
   });
 });

@@ -1,4 +1,4 @@
-import { TALK_TYPES, type TalkTypeId } from "@/lib/feday-data";
+import { PITCHABLE_TALK_TYPE_IDS, type TalkTypeId } from "@/lib/feday-data";
 
 export type TalkSubmissionInput = {
   type: string;
@@ -23,12 +23,12 @@ export type SubmitResult =
   | { ok: true; submission: SubmittedTalk }
   | { ok: false; errors: ValidationErrors; formError?: string };
 
-export const TALK_TYPE_IDS = TALK_TYPES.map((t) => t.id);
+export const TALK_TYPE_IDS = PITCHABLE_TALK_TYPE_IDS;
 
 export function validateSubmission(input: TalkSubmissionInput): ValidationErrors {
   const errors: ValidationErrors = {};
 
-  if (!TALK_TYPE_IDS.includes(input.type as TalkTypeId)) {
+  if (!PITCHABLE_TALK_TYPE_IDS.includes(input.type as TalkTypeId)) {
     errors.type = "Pick a talk type.";
   }
 

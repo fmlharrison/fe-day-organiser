@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AgendaScreen } from "@/components/agenda/AgendaScreen";
-import { AGENDA, KIND_META } from "@/lib/feday-data";
+import { AGENDA, formatFeDayTimeDisplay, KIND_META } from "@/lib/feday-data";
 
 const noop = () => {};
 
@@ -33,9 +33,9 @@ describe("AgendaScreen", () => {
       expect(screen.getByText("JUL 1")).toBeInTheDocument();
     });
 
-    it("shows the time range 10:00–17:00 (en-dash)", () => {
+    it("shows the time range from FE_DAY (en-dash)", () => {
       render(<AgendaScreen user={user} signOutAction={noop} />);
-      expect(screen.getByText("10:00–17:00")).toBeInTheDocument();
+      expect(screen.getByText(formatFeDayTimeDisplay())).toBeInTheDocument();
     });
 
     it("shows the location LION'S SHARE + REMOTE", () => {
@@ -53,8 +53,9 @@ describe("AgendaScreen", () => {
         (c) => c.textContent,
       );
       expect(chipLabels).toEqual(
-        expect.arrayContaining(["LIGHTNING TALK", "LONG TALK", "WORKSHOP", "BREAK"]),
+        expect.arrayContaining(["LIGHTNING TALK", "LONG TALK", "BREAK"]),
       );
+      expect(chipLabels).not.toContain("WORKSHOP");
     });
   });
 
@@ -121,14 +122,7 @@ describe("AgendaScreen", () => {
       expect(screen.getByText("Closing")).toBeInTheDocument();
     });
 
-    it("renders exactly 16 timeline rows", () => {
-      const { container } = render(
-        <AgendaScreen user={user} signOutAction={noop} />,
-      );
-      expect(container.querySelectorAll(".ag-row")).toHaveLength(16);
-    });
-
-    it("renders one timeline row per agenda entry", () => {
+    it("renders exactly one timeline row per agenda entry", () => {
       const { container } = render(
         <AgendaScreen user={user} signOutAction={noop} />,
       );

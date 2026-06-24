@@ -17,7 +17,7 @@ const vt323 = VT323({
 export const metadata: Metadata = {
   title: "FE Day 2026 · Pitch a Talk",
   description:
-    "Cleo's Front-End chapter day. View the agenda and pitch a lightning talk, long talk or workshop.",
+    "Cleo's Front-End chapter day. View the agenda and pitch a lightning talk or long talk.",
 };
 
 export default function RootLayout({

@@ -96,7 +96,7 @@ feday_design_specs/  the original design prototype (reference only — not shipp
 ## Notes & current limitations
 
 - The agenda is hard-coded in [`src/lib/feday-data.ts`](src/lib/feday-data.ts).
-- Talk-type durations (lightning 10 / talk 30 / workshop 60 min) follow the agenda's slot lengths.
+- Talk-type durations (lightning 10 / talk 30 min) follow the agenda's slot lengths. Workshop slots are no longer offered.
 - Read screens show an empty state when there's no data; a transient read error currently also
   surfaces as "empty" (no dedicated error UI yet).
 - Deployment isn't configured yet — it's a local-first build. On a host (e.g. Vercel), set the

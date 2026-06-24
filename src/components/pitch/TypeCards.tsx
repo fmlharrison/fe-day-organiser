@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { TALK_TYPES, type TalkTypeId } from "@/lib/feday-data";
+import { PITCHABLE_TALK_TYPES, type TalkTypeId } from "@/lib/feday-data";
 import { TypeIcon } from "@/components/ui/TypeIcon";
 
 type TypeCardsProps = {
@@ -12,7 +12,7 @@ type TypeCardsProps = {
 export function TypeCards({ value, onChange }: TypeCardsProps) {
   return (
     <div className="type-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-      {TALK_TYPES.map((t) => (
+      {PITCHABLE_TALK_TYPES.map((t) => (
         <button
           type="button"
           key={t.id}

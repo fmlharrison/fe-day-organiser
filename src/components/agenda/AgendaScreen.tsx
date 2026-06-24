@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PixelFrame } from "@/components/ui/PixelFrame";
 import { Chip } from "@/components/ui/Chip";
 import { Stat } from "@/components/ui/Stat";
-import { AGENDA, KIND_META, OPEN_AGENDA_SLOTS, TALK_TYPES } from "@/lib/feday-data";
+import { AGENDA, FE_DAY, formatFeDayTimeDisplay, KIND_META, OPEN_AGENDA_SLOTS, PITCHABLE_TALK_TYPES } from "@/lib/feday-data";
 import type { AssignedTalk } from "@/lib/agenda";
 import { getRemainingOpenSlotCount, resolveAgendaRow } from "@/lib/agenda";
 import type { SessionUser } from "@/lib/auth/user";
@@ -55,8 +55,8 @@ export function AgendaScreen({
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, margin: "22px 0 14px" }}>
           <Stat k="DATE" v="JUL 1" />
-          <Stat k="TIME" v="10:00–17:00" />
-          <Stat k="WHERE" v="LION'S SHARE + REMOTE" />
+          <Stat k="TIME" v={formatFeDayTimeDisplay()} />
+          <Stat k="WHERE" v={FE_DAY.loc} />
         </div>
 
         {setAttendanceAction && (
@@ -75,7 +75,7 @@ export function AgendaScreen({
         )}
 
         <div className="row" style={{ gap: 10, flexWrap: "wrap", margin: "20px 0 30px" }}>
-          {TALK_TYPES.map((t) => (
+          {PITCHABLE_TALK_TYPES.map((t) => (
             <Chip key={t.id} swatch={t.color}>
               {t.name}
             </Chip>
@@ -92,7 +92,7 @@ export function AgendaScreen({
               <div className="txt" style={{ fontSize: 20 }}>
                 {remainingOpen > 0
                   ? `${remainingOpen} of ${OPEN_AGENDA_SLOTS.length} talk slots still open. Grab one — pitch the thing you’ve been dying to share.`
-                  : "Every talk, lightning and workshop slot is filled. See you on the day!"}
+                  : "Every talk and lightning slot is filled. See you on the day!"}
               </div>
             </div>
             {remainingOpen > 0 && (

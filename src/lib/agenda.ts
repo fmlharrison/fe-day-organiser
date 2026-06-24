@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
-import { OPEN_AGENDA_SLOTS, SLOT_BY_ID, type AgendaRow } from "@/lib/feday-data";
+import {
+  OPEN_AGENDA_SLOTS,
+  OPEN_SLOT_IDS,
+  SLOT_BY_ID,
+  type AgendaRow,
+} from "@/lib/feday-data";
 import type { TalkTypeId } from "@/lib/feday-data";
 
 export type AssignedTalk = {
@@ -104,10 +109,21 @@ export function resolveAgendaRow(
   };
 }
 
+export function getOrphanedAssignments(
+  assignmentsBySlot: Record<string, AssignedTalk>,
+): AssignedTalk[] {
+  return Object.values(assignmentsBySlot).filter(
+    (assignment) => !OPEN_SLOT_IDS.has(assignment.slotId),
+  );
+}
+
 export function getRemainingOpenSlotCount(
   assignmentsBySlot: Record<string, AssignedTalk>,
 ): number {
-  return OPEN_AGENDA_SLOTS.length - Object.keys(assignmentsBySlot).length;
+  const filledOpenSlots = Object.keys(assignmentsBySlot).filter((slotId) =>
+    OPEN_SLOT_IDS.has(slotId),
+  ).length;
+  return OPEN_AGENDA_SLOTS.length - filledOpenSlots;
 }
 
 export type AssignmentValidationResult = { ok: true } | { ok: false; formError: string };
@@ -118,12 +134,15 @@ export function validateAssignment(params: {
   submissionType: TalkTypeId;
   assignmentsBySlot: Record<string, AssignedTalk>;
 }): AssignmentValidationResult {
-  const slot = SLOT_BY_ID[params.slotId];
-  if (!slot) {
+  const openSlot = OPEN_AGENDA_SLOTS.find((row) => row.id === params.slotId);
+  if (!openSlot) {
+    if (SLOT_BY_ID[params.slotId]) {
+      return { ok: false, formError: "That agenda slot is no longer available." };
+    }
     return { ok: false, formError: "That agenda slot doesn't exist." };
   }
 
-  if (params.submissionType !== slot.kind) {
+  if (params.submissionType !== openSlot.kind) {
     return { ok: false, formError: "Talk type doesn't match the slot type." };
   }
 
