@@ -12,13 +12,13 @@ export const FE_DAY = {
   title: "FE DAY",
   year: "2026",
   date: "WED · JULY 1 · 2026",
-  time: "10:00 — 15:45",
+  time: "10:00 — 16:00",
   loc: "LION'S SHARE + REMOTE",
   tagline: "INSERT COIN — SHARE WHAT YOU KNOW",
 };
 
 export function formatFeDayTimeDisplay(): string {
-  return FE_DAY.time.replace(/\s—\s/g, "–");
+  return FE_DAY.time.replace(/\s—\s/g, "-");
 }
 
 export const TALK_TYPES: TalkType[] = [

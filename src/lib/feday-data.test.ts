@@ -33,9 +33,9 @@ describe("FE_DAY", () => {
     }
   });
 
-  it("advertises the 10:00–15:45 window", () => {
-    expect(FE_DAY.time).toBe("10:00 — 15:45");
-    expect(formatFeDayTimeDisplay()).toBe("10:00–15:45");
+  it("advertises the 10:00-16:00 window", () => {
+    expect(FE_DAY.time).toBe("10:00 — 16:00");
+    expect(formatFeDayTimeDisplay()).toBe("10:00-16:00");
   });
 });
 

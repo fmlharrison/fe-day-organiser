@@ -51,7 +51,7 @@ describe("AgendaScreen", () => {
       expect(screen.getByText("JUL 1")).toBeInTheDocument();
     });
 
-    it("shows the time range from FE_DAY (en-dash)", () => {
+    it("shows the time range from FE_DAY", () => {
       render(<AgendaScreen user={user} signOutAction={noop} />);
       expect(screen.getByText(formatFeDayTimeDisplay())).toBeInTheDocument();
     });
