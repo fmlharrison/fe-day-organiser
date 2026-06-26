@@ -78,7 +78,7 @@ export const AGENDA: AgendaRow[] = [
   { id: "lightning-3", t: "15:05", end: "15:15", kind: "lightning", title: "Lightning Slot #3", desc: "Back-to-back sparks." },
   { id: "lightning-4", t: "15:15", end: "15:25", kind: "lightning", title: "Lightning Slot #4", desc: "Still going." },
   { id: "lightning-5", t: "15:25", end: "15:35", kind: "lightning", title: "Lightning Slot #5", desc: "Last spark of the day." },
-  { t: "15:35", end: "15:45", kind: "fixed", title: "Closing", desc: "Wrap-up, thank-yous and quick-fire FE Day awards." },
+  { t: "15:35", end: "15:45", kind: "fixed", title: "Closing", desc: "Wrap-up and thank-yous." },
   { t: "18:00", end: "20:00", kind: "fixed", title: "Social — Bowling @ All Star Lanes", desc: "Brick Lane, 6–8pm. A game of bowling, 2 drinks each and some nibbles — head over after closing wraps up." },
 ];
 
