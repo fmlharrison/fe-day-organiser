@@ -73,12 +73,26 @@ describe("MyPitchesScreen", () => {
       render(
         <MyPitchesScreen user={user} signOutAction={noop} submissions={[]} />,
       );
-      // Both the TopBar and the empty-state CTA can link to /pitch, so assert
-      // on the set of /pitch links rather than a single unambiguous match.
       const pitchLinks = screen
         .getAllByRole("link")
         .filter((link) => link.getAttribute("href") === "/pitch");
       expect(pitchLinks.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("does not offer a pitch link when pitching is closed", () => {
+      render(
+        <MyPitchesScreen
+          user={user}
+          signOutAction={noop}
+          submissions={[]}
+          pitchingClosed
+        />,
+      );
+      const pitchLinks = screen
+        .getAllByRole("link")
+        .filter((link) => link.getAttribute("href") === "/pitch");
+      expect(pitchLinks).toHaveLength(0);
+      expect(screen.getByText(/pitching is closed/i)).toBeInTheDocument();
     });
   });
 });

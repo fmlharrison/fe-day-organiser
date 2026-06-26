@@ -10,6 +10,7 @@ import {
   type TalkSubmissionInput,
 } from "@/lib/validation";
 import type { TalkTypeId } from "@/lib/feday-data";
+import { getAgendaAssignments, isPitchingClosed } from "@/lib/agenda";
 
 export async function submitTalk(input: TalkSubmissionInput): Promise<SubmitResult> {
   const errors = validateSubmission(input);
@@ -20,6 +21,15 @@ export async function submitTalk(input: TalkSubmissionInput): Promise<SubmitResu
   const user = await getSessionUser();
   if (!user) {
     return { ok: false, errors: {}, formError: "Your session expired. Please sign in again." };
+  }
+
+  const assignments = await getAgendaAssignments();
+  if (isPitchingClosed(assignments)) {
+    return {
+      ok: false,
+      errors: {},
+      formError: "All talk slots are filled — pitching is closed.",
+    };
   }
 
   const supabase = await createClient();

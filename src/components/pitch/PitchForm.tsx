@@ -20,10 +20,11 @@ import { SuccessModal } from "@/components/pitch/SuccessModal";
 type PitchFormProps = {
   userName: string;
   presetType?: string;
+  pitchingClosed?: boolean;
   submitAction: (input: TalkSubmissionInput) => Promise<SubmitResult>;
 };
 
-export function PitchForm({ userName, presetType, submitAction }: PitchFormProps) {
+export function PitchForm({ userName, presetType, pitchingClosed = false, submitAction }: PitchFormProps) {
   const [form, setForm] = useState<TalkSubmissionInput>({
     type:
       presetType && (TALK_TYPE_IDS as string[]).includes(presetType)
@@ -61,6 +62,31 @@ export function PitchForm({ userName, presetType, submitAction }: PitchFormProps
     }
     setSubmitting(false);
   };
+
+  if (pitchingClosed) {
+    return (
+      <div>
+        <div style={{ marginBottom: 26 }}>
+          <Link
+            href="/agenda"
+            className="pixel"
+            style={{ display: "inline-block", color: "var(--teal)", fontSize: 11, marginBottom: 16 }}
+          >
+            {'<'} BACK TO AGENDA
+          </Link>
+          <h1 style={{ fontSize: "clamp(24px,5vw,38px)", color: "var(--gold)", textShadow: "4px 4px 0 var(--shadow)" }}>
+            PITCHING CLOSED
+          </h1>
+          <div className="txt" style={{ fontSize: 20, color: "var(--ink-dim)", marginTop: 12 }}>
+            Every talk and lightning slot is filled. See you on the day!
+          </div>
+        </div>
+        <Link href="/agenda" className="btn orange">
+          BACK TO AGENDA {'>'}
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div>

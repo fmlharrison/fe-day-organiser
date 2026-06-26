@@ -11,6 +11,14 @@ const DESC_PLACEHOLDER = /A few lines/i;
 const TEAM_PLACEHOLDER = /e\.g\. Web Platform/i;
 
 describe("PitchForm", () => {
+  describe("pitching closed", () => {
+    it("shows a closed message instead of the form", () => {
+      render(<PitchForm userName="Ada Pixel" pitchingClosed submitAction={vi.fn()} />);
+      expect(screen.getByRole("heading", { name: /pitching closed/i })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /submit idea/i })).toBeNull();
+    });
+  });
+
   describe("prefill", () => {
     it("prefills the name field from userName", () => {
       render(<PitchForm userName="Ada Pixel" submitAction={vi.fn()} />);

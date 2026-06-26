@@ -12,6 +12,7 @@ type MyPitchesScreenProps = {
   signOutAction: () => void | Promise<void>;
   submissions: TalkSubmissionRow[];
   assignmentsBySubmission?: Record<string, AssignedTalk>;
+  pitchingClosed?: boolean;
 };
 
 export function MyPitchesScreen({
@@ -20,6 +21,7 @@ export function MyPitchesScreen({
   signOutAction,
   submissions,
   assignmentsBySubmission = {},
+  pitchingClosed = false,
 }: MyPitchesScreenProps) {
   const firstName = user.name.split(/\s+/)[0]?.toUpperCase();
 
@@ -52,6 +54,8 @@ export function MyPitchesScreen({
               </div>
             )}
           </>
+        ) : pitchingClosed ? (
+          <div className="txt">No pitches in the queue yet. All talk slots are filled — pitching is closed.</div>
         ) : (
           <div className="row" style={{ gap: 18, flexWrap: "wrap" }}>
             <div className="txt">No pitches in the queue yet.</div>

@@ -57,6 +57,7 @@ export async function assignSubmissionToSlot(
   revalidatePath("/admin");
   revalidatePath("/agenda");
   revalidatePath("/my-pitches");
+  revalidatePath("/pitch");
 
   return { ok: true };
 }
@@ -79,6 +80,7 @@ export async function unassignSubmission(submissionId: string): Promise<AssignRe
   revalidatePath("/admin");
   revalidatePath("/agenda");
   revalidatePath("/my-pitches");
+  revalidatePath("/pitch");
 
   return { ok: true };
 }

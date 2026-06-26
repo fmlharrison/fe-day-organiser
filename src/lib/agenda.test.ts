@@ -3,6 +3,7 @@ import {
   resolveAgendaRow,
   validateAssignment,
   getRemainingOpenSlotCount,
+  isPitchingClosed,
   getOrphanedAssignments,
 } from "@/lib/agenda";
 import { AGENDA, OPEN_AGENDA_SLOTS, getOpenSlotsForType } from "@/lib/feday-data";
@@ -128,6 +129,23 @@ describe("getRemainingOpenSlotCount", () => {
         "workshop-1": { ...sampleAssignment, slotId: "workshop-1", type: "workshop" },
       }),
     ).toBe(OPEN_AGENDA_SLOTS.length);
+  });
+});
+
+describe("isPitchingClosed", () => {
+  it("returns false when open slots remain", () => {
+    expect(isPitchingClosed({})).toBe(false);
+    expect(isPitchingClosed({ "talk-1": sampleAssignment })).toBe(false);
+  });
+
+  it("returns true when every open slot is assigned", () => {
+    const filled = Object.fromEntries(
+      OPEN_AGENDA_SLOTS.map((slot, i) => [
+        slot.id,
+        { ...sampleAssignment, slotId: slot.id, submissionId: `sub-${i}`, type: slot.kind },
+      ]),
+    );
+    expect(isPitchingClosed(filled)).toBe(true);
   });
 });
 

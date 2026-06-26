@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AgendaScreen } from "@/components/agenda/AgendaScreen";
-import { AGENDA, formatFeDayTimeDisplay, KIND_META } from "@/lib/feday-data";
+import { AGENDA, formatFeDayTimeDisplay, KIND_META, OPEN_AGENDA_SLOTS } from "@/lib/feday-data";
+import type { AssignedTalk } from "@/lib/agenda";
 
 const noop = () => {};
 
@@ -11,6 +12,23 @@ const user = { id: "u1", email: "ada@meetcleo.com", name: "Ada Pixel" };
 // set of open ("claimable") slots, so derive expectations from it rather than
 // hardcoding — a builder that drifts from the data will fail these.
 const openRows = AGENDA.filter((row) => KIND_META[row.kind].open);
+
+function allSlotsFilled(): Record<string, AssignedTalk> {
+  return Object.fromEntries(
+    OPEN_AGENDA_SLOTS.map((slot, i) => [
+      slot.id,
+      {
+        slotId: slot.id,
+        submissionId: `sub-${i}`,
+        title: `Talk ${i}`,
+        description: "Desc",
+        submitterName: "Ada Pixel",
+        team: "Web Platform",
+        type: slot.kind,
+      },
+    ]),
+  );
+}
 
 describe("AgendaScreen", () => {
   describe("header", () => {
@@ -103,6 +121,19 @@ describe("AgendaScreen", () => {
         .getAllByRole("link", { name: /submit a talk idea/i })
         .filter((link) => link.getAttribute("href") === "/pitch");
       expect(links.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("shows AGENDA LOCKED IN when every slot is filled", () => {
+      render(
+        <AgendaScreen
+          user={user}
+          signOutAction={noop}
+          assignmentsBySlot={allSlotsFilled()}
+        />,
+      );
+      expect(screen.getByText(/AGENDA LOCKED IN/i)).toBeInTheDocument();
+      expect(screen.queryByRole("link", { name: /submit a talk idea/i })).toBeNull();
+      expect(screen.queryByRole("link", { name: /\+ PITCH A TALK/i })).toBeNull();
     });
   });
 

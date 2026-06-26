@@ -144,9 +144,11 @@ export function AgendaScreen({
         <div className="pdiv" style={{ margin: "40px 0 24px" }} />
         <div className="row between" style={{ flexWrap: "wrap", gap: 16 }}>
           <div className="txt-sm">Times are a rough map — final running order set once talks are in.</div>
-          <Link href="/pitch" className="btn orange">
-            + PITCH A TALK
-          </Link>
+          {remainingOpen > 0 && (
+            <Link href="/pitch" className="btn orange">
+              + PITCH A TALK
+            </Link>
+          )}
         </div>
       </div>
     </div>

@@ -126,6 +126,12 @@ export function getRemainingOpenSlotCount(
   return OPEN_AGENDA_SLOTS.length - filledOpenSlots;
 }
 
+export function isPitchingClosed(
+  assignmentsBySlot: Record<string, AssignedTalk>,
+): boolean {
+  return getRemainingOpenSlotCount(assignmentsBySlot) === 0;
+}
+
 export type AssignmentValidationResult = { ok: true } | { ok: false; formError: string };
 
 export function validateAssignment(params: {
