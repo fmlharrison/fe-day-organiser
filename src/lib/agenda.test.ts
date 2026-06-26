@@ -147,8 +147,8 @@ describe("getOpenSlotsForType", () => {
     expect(getOpenSlotsForType("talk")).toHaveLength(3);
   });
 
-  it("returns three lightning slots", () => {
-    expect(getOpenSlotsForType("lightning")).toHaveLength(3);
+  it("returns five lightning slots", () => {
+    expect(getOpenSlotsForType("lightning")).toHaveLength(5);
   });
 
   it("returns no workshop slots", () => {

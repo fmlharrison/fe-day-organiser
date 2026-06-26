@@ -12,7 +12,7 @@ export const FE_DAY = {
   title: "FE DAY",
   year: "2026",
   date: "WED · JULY 1 · 2026",
-  time: "10:30 — 16:00",
+  time: "10:00 — 15:45",
   loc: "LION'S SHARE + REMOTE",
   tagline: "INSERT COIN — SHARE WHAT YOU KNOW",
 };
@@ -65,25 +65,26 @@ export type AgendaRow = {
 };
 
 export const AGENDA: AgendaRow[] = [
-  { t: "10:30", end: "11:00", kind: "fixed", title: "Doors Open + Ice Breaker", desc: "Grab a coffee (or a tea, we don't judge) and a quick warm-up game to get the chapter talking." },
-  { t: "11:00", end: "11:30", kind: "fixed", title: "The State of the FE at Cleo", desc: "Joe Angus opens the day with a 30-minute look at where front-end at Cleo is right now — and where it's heading." },
-  { t: "11:30", end: "11:50", kind: "break", title: "Morning Break", desc: "A 20-minute stretch — legs, mug, repeat." },
-  { id: "lightning-1", t: "11:50", end: "12:00", kind: "lightning", title: "Lightning Slot #1", desc: "A 10-minute spark before we break for lunch." },
-  { id: "talk-1", t: "12:00", end: "12:30", kind: "talk", title: "Talk Slot #1", desc: "30 minutes to go deep on something you love." },
+  { t: "10:00", end: "10:30", kind: "fixed", title: "Doors Open + Ice Breaker", desc: "Grab a coffee (or a tea, we don't judge) and a quick warm-up game to get the chapter talking." },
+  { t: "10:30", end: "11:00", kind: "fixed", title: "The State of the FE at Cleo", desc: "Joe Angus opens the day with a 30-minute look at where front-end at Cleo is right now — and where it's heading." },
+  { t: "11:00", end: "11:20", kind: "break", title: "Morning Break", desc: "A 20-minute stretch — legs, mug, repeat." },
+  { id: "talk-1", t: "11:20", end: "11:50", kind: "talk", title: "Talk Slot #1", desc: "30 minutes to go deep on something you love." },
+  { id: "talk-2", t: "11:50", end: "12:20", kind: "talk", title: "Talk Slot #2", desc: "30 minutes — your stage." },
   { t: "12:30", end: "14:00", kind: "break", title: "Lunch", desc: "Fuel up. 90 minutes to eat, chat and recharge." },
-  { id: "talk-2", t: "14:00", end: "14:30", kind: "talk", title: "Talk Slot #2", desc: "30 minutes — your stage." },
-  { id: "lightning-2", t: "14:30", end: "14:40", kind: "lightning", title: "Lightning Slot #2", desc: "A post-lunch energy spark." },
-  { t: "14:40", end: "15:05", kind: "break", title: "Afternoon Break", desc: "A 25-minute refuel before the final stretch." },
-  { id: "talk-3", t: "15:05", end: "15:35", kind: "talk", title: "Talk Slot #3", desc: "30 minutes to teach us something new." },
-  { id: "lightning-3", t: "15:35", end: "15:45", kind: "lightning", title: "Lightning Slot #3", desc: "Last spark of the day." },
-  { t: "15:45", end: "15:55", kind: "fixed", title: "Closing", desc: "Wrap-up, thank-yous and quick-fire FE Day awards." },
+  { id: "talk-3", t: "14:00", end: "14:30", kind: "talk", title: "Talk Slot #3", desc: "30 minutes to teach us something new." },
+  { id: "lightning-1", t: "14:30", end: "14:40", kind: "lightning", title: "Lightning Slot #1", desc: "A post-lunch energy spark." },
+  { id: "lightning-2", t: "14:40", end: "14:50", kind: "lightning", title: "Lightning Slot #2", desc: "Another quick hit to keep the pace up." },
+  { t: "14:50", end: "15:05", kind: "break", title: "Afternoon Break", desc: "A 15-minute refuel before the lightning run." },
+  { id: "lightning-3", t: "15:05", end: "15:15", kind: "lightning", title: "Lightning Slot #3", desc: "Back-to-back sparks." },
+  { id: "lightning-4", t: "15:15", end: "15:25", kind: "lightning", title: "Lightning Slot #4", desc: "Still going." },
+  { id: "lightning-5", t: "15:25", end: "15:35", kind: "lightning", title: "Lightning Slot #5", desc: "Last spark of the day." },
+  { t: "15:35", end: "15:45", kind: "fixed", title: "Closing", desc: "Wrap-up, thank-yous and quick-fire FE Day awards." },
   { t: "18:00", end: "20:00", kind: "fixed", title: "Social — Bowling @ All Star Lanes", desc: "Brick Lane, 6–8pm. A game of bowling, 2 drinks each and some nibbles — head over after closing wraps up." },
 ];
 
 /** Retired slot ids kept for assignment label lookup (not shown on the agenda). */
 export const LEGACY_SLOTS: (AgendaRow & { id: string })[] = [
   { id: "talk-4", t: "14:40", end: "15:10", kind: "talk", title: "Talk Slot #4 (removed)", desc: "This slot is no longer on the agenda." },
-  { id: "lightning-4", t: "15:20", end: "15:30", kind: "lightning", title: "Lightning Slot #4 (removed)", desc: "This slot is no longer on the agenda." },
   { id: "workshop-1", t: "15:45", end: "16:45", kind: "workshop", title: "Workshop (removed)", desc: "This slot is no longer on the agenda." },
 ];
 
