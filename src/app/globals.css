@@ -212,6 +212,37 @@ p, li, label, input, textarea, select, button {
 
 .char-count { font-family: var(--font-body); font-size: 17px; color: var(--ink-dim); text-align: right; }
 
+/* ---------- star rating ---------- */
+.star-rating { display: flex; gap: clamp(6px, 2vw, 14px); width: fit-content; }
+.star-rating-option {
+  position: relative;
+  display: block;
+  color: var(--ink-dim);
+  cursor: pointer;
+  line-height: 1;
+}
+.star-rating-option.selected { color: var(--gold); }
+.star-rating-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.star-rating-star {
+  display: block;
+  font-size: clamp(36px, 8vw, 48px);
+  transition: color 0.08s steps(1), transform 0.08s steps(1);
+}
+.star-rating-option:hover .star-rating-star { transform: translateY(-2px); }
+.star-rating-input:focus-visible + .star-rating-star {
+  outline: 3px solid var(--teal);
+  outline-offset: 3px;
+}
+.star-rating-input:disabled + .star-rating-star {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 /* ---------- talk type pixel cards ---------- */
 .type-grid { display: grid; gap: 16px; }
 .type-card {

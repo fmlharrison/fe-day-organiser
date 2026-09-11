@@ -63,7 +63,37 @@ describe("FeedbackForm", () => {
         name: new RegExp(`${rating} stars?`, "i"),
       });
       expect(radio).toBeRequired();
+      expect(radio).toHaveClass("star-rating-input");
     }
+  });
+
+  it("fills the selected star and every star to its left", async () => {
+    const user = userEvent.setup();
+    const saveAction = vi
+      .fn<SaveAction>()
+      .mockResolvedValue({ ok: true, feedback: feedback({ rating: 3 }) });
+    renderForm(saveAction);
+    const radios = screen.getAllByRole("radio");
+
+    for (const radio of radios) {
+      expect(radio.closest("label")).not.toHaveClass("selected");
+      expect(radio.nextElementSibling).toHaveTextContent("☆");
+    }
+
+    await user.click(screen.getByRole("radio", { name: /3 stars/i }));
+
+    for (const [index, radio] of radios.entries()) {
+      if (index < 3) {
+        expect(radio.closest("label")).toHaveClass("selected");
+        expect(radio.nextElementSibling).toHaveTextContent("★");
+      } else {
+        expect(radio.closest("label")).not.toHaveClass("selected");
+        expect(radio.nextElementSibling).toHaveTextContent("☆");
+      }
+    }
+
+    await user.click(screen.getByRole("button", { name: /save feedback/i }));
+    expect(saveAction).toHaveBeenCalledWith({ rating: 3, comments: "" });
   });
 
   it("does not submit without a rating and shows validation", async () => {
@@ -214,6 +244,9 @@ describe("FeedbackForm", () => {
     expect(submit.closest("form")).toHaveAttribute("aria-busy", "true");
     expect(screen.getByRole("status")).toHaveTextContent("Saving feedback...");
     expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
+    for (const radio of screen.getAllByRole("radio")) {
+      expect(radio).toBeDisabled();
+    }
     expect(saveAction).toHaveBeenCalledTimes(1);
     await user.click(submit);
     expect(saveAction).toHaveBeenCalledTimes(1);

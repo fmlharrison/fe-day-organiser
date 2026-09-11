@@ -141,23 +141,14 @@ export function FeedbackForm({
               >
                 YOUR RATING *
               </legend>
-              <div
-                className="row"
-                style={{ gap: "clamp(6px, 2vw, 14px)", flexWrap: "wrap" }}
-              >
+              <div className="star-rating">
                 {RATINGS.map((value) => (
                   <label
                     key={value}
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 6,
-                      cursor: submitting ? "not-allowed" : "pointer",
-                      color: rating !== null && value <= rating ? "var(--gold)" : "var(--ink-dim)",
-                      fontSize: 30,
-                    }}
+                    className={`star-rating-option${rating !== null && value <= rating ? " selected" : ""}`}
                   >
                     <input
+                      className="star-rating-input"
                       type="radio"
                       name="rating"
                       value={value}
@@ -169,11 +160,9 @@ export function FeedbackForm({
                         setErrors((current) => ({ ...current, rating: undefined }));
                         setSuccess(false);
                       }}
-                      style={{ accentColor: "var(--gold)" }}
                     />
-                    <span aria-hidden="true">★</span>
-                    <span className="pixel" style={{ fontSize: 9 }}>
-                      {value}
+                    <span className="star-rating-star" aria-hidden="true">
+                      {rating !== null && value <= rating ? "★" : "☆"}
                     </span>
                   </label>
                 ))}
