@@ -135,6 +135,14 @@ export function AgendaScreen({
                       OPEN SLOT — CLAIM IT
                     </Link>
                   )}
+                  {assignment && resolved.isFilled && (
+                    <Link
+                      href={`/agenda/${assignment.submissionId}/feedback`}
+                      className="ag-open"
+                    >
+                      RATE THIS TALK {'>'}
+                    </Link>
+                  )}
                 </div>
               </div>
             );

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { AgendaScreen } from "@/components/agenda/AgendaScreen";
 import { AGENDA, formatFeDayTimeDisplay, KIND_META, OPEN_AGENDA_SLOTS } from "@/lib/feday-data";
 import type { AssignedTalk } from "@/lib/agenda";
@@ -188,7 +188,7 @@ describe("AgendaScreen", () => {
       expect(claimLinks).toHaveLength(openRows.length);
     });
 
-    it("shows assigned talk title and speaker instead of the placeholder", () => {
+    it("shows assigned talk details and links to its feedback screen", () => {
       render(
         <AgendaScreen
           user={user}
@@ -209,6 +209,32 @@ describe("AgendaScreen", () => {
       expect(screen.getByText("Deleting 40% Of Our CSS")).toBeInTheDocument();
       expect(screen.getByText(/Ada Pixel, Web Platform/)).toBeInTheDocument();
       expect(screen.queryByText("Talk Slot #1")).toBeNull();
+      expect(
+        screen.getByRole("link", { name: /^RATE THIS TALK\b/i }),
+      ).toHaveAttribute("href", "/agenda/sub-1/feedback");
+    });
+
+    it("does not show a feedback link on an unassigned open slot", () => {
+      render(<AgendaScreen user={user} signOutAction={noop} />);
+      const openSlotRow = screen.getByText("Talk Slot #1").closest(".ag-row");
+
+      expect(openSlotRow).not.toBeNull();
+      expect(
+        within(openSlotRow!).queryByRole("link", { name: /RATE THIS TALK/i }),
+      ).toBeNull();
+    });
+
+    it("does not show a feedback link on fixed or break rows", () => {
+      render(<AgendaScreen user={user} signOutAction={noop} />);
+
+      for (const title of ["Doors Open + Ice Breaker", "Lunch"]) {
+        const row = screen.getByText(title).closest(".ag-row");
+
+        expect(row).not.toBeNull();
+        expect(
+          within(row!).queryByRole("link", { name: /RATE THIS TALK/i }),
+        ).toBeNull();
+      }
     });
 
     it("hides the claim link on a filled slot", () => {
@@ -229,10 +255,19 @@ describe("AgendaScreen", () => {
           }}
         />,
       );
-      const claimLinks = screen.queryAllByRole("link", {
-        name: /OPEN SLOT — CLAIM IT/i,
-      });
-      expect(claimLinks).toHaveLength(openRows.length - 1);
+      const filledSlotRow = screen
+        .getByText("Deleting 40% Of Our CSS")
+        .closest(".ag-row");
+
+      expect(filledSlotRow).not.toBeNull();
+      expect(
+        within(filledSlotRow!).queryByRole("link", {
+          name: /OPEN SLOT — CLAIM IT/i,
+        }),
+      ).toBeNull();
+      expect(
+        screen.getAllByRole("link", { name: /OPEN SLOT — CLAIM IT/i }),
+      ).toHaveLength(openRows.length - 1);
     });
   });
 });

@@ -16,6 +16,7 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
 |---|---|---|
 | `/` | public | Landing + "Sign in with Google" |
 | `/agenda` | signed-in | The FE Day running order |
+| `/agenda/[submissionId]/feedback` | signed-in | Rate an assigned talk and update your own feedback |
 | `/pitch` | signed-in | Pitch a talk (open agenda slots deep-link here via `?type=`) |
 | `/my-pitches` | signed-in | Your own submissions |
 | `/attendees` | signed-in | RSVP + who's coming to FE Day |
@@ -39,6 +40,7 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
    - [`supabase/migrations/0002_agenda_assignments.sql`](supabase/migrations/0002_agenda_assignments.sql) — slot assignments for the agenda
    - [`supabase/migrations/0003_event_attendance.sql`](supabase/migrations/0003_event_attendance.sql) — in-person / remote RSVPs
    - [`supabase/migrations/0004_assigned_submissions_read.sql`](supabase/migrations/0004_assigned_submissions_read.sql) — let attendees read talks on the agenda
+   - [`supabase/migrations/0005_talk_feedback.sql`](supabase/migrations/0005_talk_feedback.sql) — reviewer-owned ratings and comments for assigned talks
 4. **Enable Google auth.** In Supabase: *Authentication → Providers → Google*. Create a Google
    OAuth client in the Google Cloud Console, set its authorized redirect URI to
    `https://<your-project-ref>.supabase.co/auth/v1/callback`, and paste the client ID/secret
