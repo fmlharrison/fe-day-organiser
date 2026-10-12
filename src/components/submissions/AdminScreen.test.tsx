@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { AdminScreen } from "@/components/submissions/AdminScreen";
 import type { TalkSubmissionRow } from "@/lib/submissions";
 import type { AssignedTalk } from "@/lib/agenda";
+import { julyAgenda, julyEvent } from "@/test/fixtures";
 
 const noop = () => {};
 
@@ -50,7 +51,7 @@ describe("AdminScreen", () => {
   describe("heading", () => {
     it("renders the ALL PITCHES heading", () => {
       render(
-        <AdminScreen user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
+        <AdminScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
       );
       expect(screen.getByText(/ALL PITCHES/i)).toBeInTheDocument();
     });
@@ -59,7 +60,7 @@ describe("AdminScreen", () => {
   describe("with submissions", () => {
     it("renders each submission title", () => {
       render(
-        <AdminScreen user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
+        <AdminScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
       );
       expect(screen.getByText("Deleting 40% Of Our CSS")).toBeInTheDocument();
       expect(screen.getByText("Tiny Wins")).toBeInTheDocument();
@@ -67,7 +68,7 @@ describe("AdminScreen", () => {
 
     it("exposes submitter emails to the organiser", () => {
       render(
-        <AdminScreen user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
+        <AdminScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
       );
       expect(screen.getByText(/ada@meetcleo\.com/)).toBeInTheDocument();
       expect(screen.getByText(/bea@meetcleo\.com/)).toBeInTheDocument();
@@ -75,14 +76,14 @@ describe("AdminScreen", () => {
 
     it("shows a count reflecting the number of submissions", () => {
       render(
-        <AdminScreen user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
+        <AdminScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
       );
       expect(screen.getByText(/2 submitted/i)).toBeInTheDocument();
     });
 
     it("offers assign controls for unassigned submissions", () => {
       render(
-        <AdminScreen user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
+        <AdminScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
       );
       expect(screen.getAllByRole("button", { name: /CONFIRM & ASSIGN/i })).toHaveLength(2);
       expect(screen.getAllByRole("combobox")).toHaveLength(2);
@@ -91,6 +92,8 @@ describe("AdminScreen", () => {
     it("shows scheduled badge and remove button for assigned submissions", () => {
       render(
         <AdminScreen
+          event={julyEvent}
+          items={julyAgenda}
           user={user}
           signOutAction={noop}
           submissions={rows}
@@ -106,7 +109,7 @@ describe("AdminScreen", () => {
   describe("empty state", () => {
     it("shows no submission titles and no submitter emails when there are no pitches", () => {
       render(
-        <AdminScreen user={user} signOutAction={noop} submissions={[]} {...emptyAssignments} />,
+        <AdminScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} submissions={[]} {...emptyAssignments} />,
       );
       expect(screen.queryByText("Deleting 40% Of Our CSS")).toBeNull();
       expect(screen.queryByText("Tiny Wins")).toBeNull();
@@ -136,6 +139,8 @@ describe("AdminScreen", () => {
     it("shows the attendees section with headcount", () => {
       render(
         <AdminScreen
+          event={julyEvent}
+          items={julyAgenda}
           user={user}
           signOutAction={noop}
           submissions={rows}
@@ -151,6 +156,8 @@ describe("AdminScreen", () => {
     it("lists attendee names and modes", () => {
       render(
         <AdminScreen
+          event={julyEvent}
+          items={julyAgenda}
           user={user}
           signOutAction={noop}
           submissions={rows}
@@ -167,7 +174,7 @@ describe("AdminScreen", () => {
 
     it("shows an empty state when nobody has RSVP'd", () => {
       render(
-        <AdminScreen user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
+        <AdminScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
       );
       expect(screen.getByText(/No one has RSVP'd yet/i)).toBeInTheDocument();
     });

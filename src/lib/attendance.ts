@@ -18,7 +18,7 @@ export const ATTENDANCE_MODES: { id: AttendanceMode; name: string; desc: string;
   {
     id: "in_person",
     name: "IN PERSON",
-    desc: "See you at Lion's Share — coffee, talks and the full chapter vibe.",
+    desc: "See you in the room — coffee, talks and the full chapter vibe.",
     color: "var(--teal)",
   },
   {

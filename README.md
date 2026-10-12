@@ -42,6 +42,7 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
    - [`supabase/migrations/0004_assigned_submissions_read.sql`](supabase/migrations/0004_assigned_submissions_read.sql) — let attendees read talks on the agenda
    - [`supabase/migrations/0005_talk_feedback.sql`](supabase/migrations/0005_talk_feedback.sql) — reviewer-owned ratings and comments for assigned talks
    - [`supabase/migrations/0006_events_and_agenda_items.sql`](supabase/migrations/0006_events_and_agenda_items.sql) — events and their agenda items, seeded with the July 2026 event
+   - [`supabase/migrations/0007_assignments_to_agenda_items.sql`](supabase/migrations/0007_assignments_to_agenda_items.sql) — point talk assignments at agenda items; let signed-out visitors read event details
 4. **Enable Google auth.** In Supabase: *Authentication → Providers → Google*. Create a Google
    OAuth client in the Google Cloud Console, set its authorized redirect URI to
    `https://<your-project-ref>.supabase.co/auth/v1/callback`, and paste the client ID/secret
@@ -98,7 +99,7 @@ feday_design_specs/  the original design prototype (reference only — not shipp
 
 ## Notes & current limitations
 
-- The agenda is hard-coded in [`src/lib/feday-data.ts`](src/lib/feday-data.ts).
+- Event details and the agenda live in the `events` and `agenda_items` tables. There's no editor UI yet, so change them with SQL. The app shows the next upcoming event, or the most recent one if none are upcoming.
 - Talk-type durations (lightning 10 / talk 30 min) follow the agenda's slot lengths. Workshop slots are no longer offered.
 - Read screens show an empty state when there's no data; a transient read error currently also
   surfaces as "empty" (no dedicated error UI yet).

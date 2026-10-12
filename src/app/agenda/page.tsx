@@ -5,17 +5,22 @@ import { requireUser } from "@/lib/auth/user";
 import { getAttendanceCounts, getAttendanceForUser } from "@/lib/attendance.server";
 import { isOrganiser } from "@/lib/submissions";
 import { getAgendaAssignments } from "@/lib/agenda";
+import { getAgendaItems, requireCurrentEvent } from "@/lib/events.server";
 
 export default async function AgendaPage() {
   const user = await requireUser();
-  const [organiser, assignmentsBySlot, attendance, attendanceCounts] = await Promise.all([
+  const event = await requireCurrentEvent();
+  const [organiser, items, assignmentsBySlot, attendance, attendanceCounts] = await Promise.all([
     isOrganiser(),
+    getAgendaItems(event.id),
     getAgendaAssignments(),
     getAttendanceForUser(user.id),
     getAttendanceCounts(),
   ]);
   return (
     <AgendaScreen
+      event={event}
+      items={items}
       user={user}
       isOrganiser={organiser}
       signOutAction={signOut}

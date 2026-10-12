@@ -6,6 +6,7 @@ import type { TalkTypeId } from "@/lib/feday-data";
 import { getAgendaAssignments, validateAssignment } from "@/lib/agenda";
 import { isOrganiser } from "@/lib/submissions";
 import { getSessionUser } from "@/lib/auth/user";
+import { getAgendaItems, getCurrentEvent } from "@/lib/events.server";
 
 export type AssignResult = { ok: true } | { ok: false; formError: string };
 
@@ -33,11 +34,20 @@ export async function assignSubmissionToSlot(
     return { ok: false, formError: "Couldn't find that submission." };
   }
 
-  const assignments = await getAgendaAssignments();
+  const event = await getCurrentEvent();
+  if (!event) {
+    return { ok: false, formError: "There's no event to assign talks to." };
+  }
+
+  const [items, assignments] = await Promise.all([
+    getAgendaItems(event.id),
+    getAgendaAssignments(),
+  ]);
   const validation = validateAssignment({
     slotId,
     submissionId,
     submissionType: submission.type as TalkTypeId,
+    items,
     assignmentsBySlot: assignments,
   });
   if (!validation.ok) {
@@ -45,7 +55,7 @@ export async function assignSubmissionToSlot(
   }
 
   const { error } = await supabase.from("agenda_assignments").insert({
-    slot_id: slotId,
+    agenda_item_id: slotId,
     submission_id: submissionId,
     assigned_by: user.id,
   });

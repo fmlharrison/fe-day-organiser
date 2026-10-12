@@ -5,13 +5,16 @@ import { requireUser } from "@/lib/auth/user";
 import { getAllAttendance, getAttendanceCounts } from "@/lib/attendance.server";
 import { getAllSubmissions, isOrganiser } from "@/lib/submissions";
 import { getAgendaAssignments, getAssignmentsBySubmissionId } from "@/lib/agenda";
+import { getAgendaItems, requireCurrentEvent } from "@/lib/events.server";
 
 export default async function AdminPage() {
   const user = await requireUser();
   if (!(await isOrganiser())) redirect("/agenda");
 
-  const [submissions, assignmentsBySlot, assignmentsBySubmission, attendees, attendanceCounts] =
+  const event = await requireCurrentEvent();
+  const [items, submissions, assignmentsBySlot, assignmentsBySubmission, attendees, attendanceCounts] =
     await Promise.all([
+      getAgendaItems(event.id),
       getAllSubmissions(),
       getAgendaAssignments(),
       getAssignmentsBySubmissionId(),
@@ -21,6 +24,8 @@ export default async function AdminPage() {
 
   return (
     <AdminScreen
+      event={event}
+      items={items}
       user={user}
       signOutAction={signOut}
       submissions={submissions}

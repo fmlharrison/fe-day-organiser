@@ -18,6 +18,7 @@ import { PixelFrame } from "@/components/ui/PixelFrame";
 
 type FeedbackFormProps = {
   assignment: AssignedTalk;
+  slotLabel: string;
   existingFeedback: TalkFeedback | null;
   saveAction: (input: FeedbackInput) => Promise<FeedbackResult>;
 };
@@ -26,6 +27,7 @@ const RATINGS: FeedbackRating[] = [1, 2, 3, 4, 5];
 
 export function FeedbackForm({
   assignment,
+  slotLabel,
   existingFeedback,
   saveAction,
 }: FeedbackFormProps) {
@@ -113,7 +115,7 @@ export function FeedbackForm({
         style={{ marginBottom: 26 }}
       >
         <div className="pixel" style={{ fontSize: 9, color: "var(--teal)" }}>
-          {assignment.slotId.toUpperCase()}
+          {slotLabel.toUpperCase()}
         </div>
         <h2 style={{ fontSize: 16, marginTop: 12 }}>{assignment.title}</h2>
         <div className="txt" style={{ marginTop: 10 }}>

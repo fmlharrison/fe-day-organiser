@@ -42,6 +42,7 @@ function renderForm(
   return render(
     <FeedbackForm
       assignment={assignment}
+      slotLabel="Talk Slot #1"
       existingFeedback={initialFeedback}
       saveAction={saveAction}
     />,

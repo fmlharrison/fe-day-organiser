@@ -1,14 +1,16 @@
 import type { CSSProperties } from "react";
-import { TYPE_BY_ID, SLOT_BY_ID, formatSlotLabel, getOpenSlotsForType } from "@/lib/feday-data";
-import type { AssignedTalk } from "@/lib/agenda";
+import { TYPE_BY_ID, formatSlotLabel } from "@/lib/feday-data";
+import { getOpenSlots, type AssignedTalk } from "@/lib/agenda";
+import type { AgendaItem } from "@/lib/events";
 import type { TalkSubmissionRow } from "@/lib/submissions";
 import { assignSubmissionFromForm, unassignSubmissionFromForm } from "@/app/admin/actions";
 import { AdminAssignForm } from "@/components/submissions/AdminAssignForm";
 
 type AdminSubmissionListProps = {
   submissions: TalkSubmissionRow[];
+  items: AgendaItem[];
+  assignmentsBySlot: Record<string, AssignedTalk>;
   assignmentsBySubmission: Record<string, AssignedTalk>;
-  takenSlotIds: Set<string>;
 };
 
 function formatDate(iso: string): string {
@@ -21,16 +23,20 @@ function formatDate(iso: string): string {
 
 export function AdminSubmissionList({
   submissions,
+  items,
+  assignmentsBySlot,
   assignmentsBySubmission,
-  takenSlotIds,
 }: AdminSubmissionListProps) {
+  const openSlots = getOpenSlots(items);
+
   return (
     <div>
       {submissions.map((row) => {
         const type = TYPE_BY_ID[row.type];
         const assignment = assignmentsBySubmission[row.id];
-        const availableSlots = getOpenSlotsForType(row.type).filter(
-          (slot) => !takenSlotIds.has(slot.id),
+        const assignedSlot = assignment && items.find((item) => item.id === assignment.slotId);
+        const availableSlots = openSlots.filter(
+          (slot) => slot.kind === row.type && !assignmentsBySlot[slot.id],
         );
 
         return (
@@ -47,10 +53,10 @@ export function AdminSubmissionList({
               {row.submitter_name} · {row.submitter_email}
             </div>
 
-            {assignment ? (
+            {assignedSlot ? (
               <div style={{ marginTop: 16 }}>
                 <div className="pixel" style={{ fontSize: 10, color: "var(--teal)", marginBottom: 10 }}>
-                  SCHEDULED · {formatSlotLabel(SLOT_BY_ID[assignment.slotId])}
+                  SCHEDULED · {formatSlotLabel(assignedSlot)}
                 </div>
                 <AdminAssignForm
                   action={unassignSubmissionFromForm}

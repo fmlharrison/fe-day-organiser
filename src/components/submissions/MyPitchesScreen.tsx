@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { TopBar } from "@/components/agenda/TopBar";
 import { SubmissionList } from "@/components/submissions/SubmissionList";
-import { SLOT_BY_ID, formatSlotLabel } from "@/lib/feday-data";
+import { formatSlotLabel } from "@/lib/feday-data";
 import type { AssignedTalk } from "@/lib/agenda";
 import type { SessionUser } from "@/lib/auth/user";
+import type { AgendaItem, EventRecord } from "@/lib/events";
 import type { TalkSubmissionRow } from "@/lib/submissions";
 
 type MyPitchesScreenProps = {
+  event: EventRecord;
+  items: AgendaItem[];
   user: SessionUser;
   isOrganiser?: boolean;
   signOutAction: () => void | Promise<void>;
@@ -16,6 +19,8 @@ type MyPitchesScreenProps = {
 };
 
 export function MyPitchesScreen({
+  event,
+  items,
   user,
   isOrganiser,
   signOutAction,
@@ -27,7 +32,7 @@ export function MyPitchesScreen({
 
   return (
     <div>
-      <TopBar user={user} isOrganiser={isOrganiser} signOutAction={signOutAction} />
+      <TopBar event={event} user={user} isOrganiser={isOrganiser} signOutAction={signOutAction} />
       <div className="wrap">
         <div className="pixel" style={{ fontSize: 10, color: "var(--teal)", marginBottom: 12 }}>
           PLAYER {firstName}
@@ -43,11 +48,12 @@ export function MyPitchesScreen({
               <div style={{ marginTop: 24 }}>
                 {submissions.map((row) => {
                   const assignment = assignmentsBySubmission[row.id];
-                  if (!assignment) return null;
+                  const slot = assignment && items.find((item) => item.id === assignment.slotId);
+                  if (!slot) return null;
                   return (
                     <div key={row.id} className="txt-sm" style={{ marginBottom: 8 }}>
                       <strong>{row.title}</strong> — in the agenda ·{" "}
-                      {formatSlotLabel(SLOT_BY_ID[assignment.slotId])}
+                      {formatSlotLabel(slot)}
                     </div>
                   );
                 })}
