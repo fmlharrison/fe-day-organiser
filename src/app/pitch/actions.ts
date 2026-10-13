@@ -11,6 +11,7 @@ import {
 } from "@/lib/validation";
 import type { TalkTypeId } from "@/lib/feday-data";
 import { getAgendaAssignments, isPitchingClosed } from "@/lib/agenda";
+import { getAgendaItems, getCurrentEvent } from "@/lib/events.server";
 
 export async function submitTalk(input: TalkSubmissionInput): Promise<SubmitResult> {
   const errors = validateSubmission(input);
@@ -23,8 +24,16 @@ export async function submitTalk(input: TalkSubmissionInput): Promise<SubmitResu
     return { ok: false, errors: {}, formError: "Your session expired. Please sign in again." };
   }
 
-  const assignments = await getAgendaAssignments();
-  if (isPitchingClosed(assignments)) {
+  const event = await getCurrentEvent();
+  if (!event) {
+    return { ok: false, errors: {}, formError: "There's no event to pitch for right now." };
+  }
+
+  const [items, assignments] = await Promise.all([
+    getAgendaItems(event.id),
+    getAgendaAssignments(),
+  ]);
+  if (isPitchingClosed(items, assignments)) {
     return {
       ok: false,
       errors: {},

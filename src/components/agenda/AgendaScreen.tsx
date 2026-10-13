@@ -3,9 +3,15 @@ import Link from "next/link";
 import { PixelFrame } from "@/components/ui/PixelFrame";
 import { Chip } from "@/components/ui/Chip";
 import { Stat } from "@/components/ui/Stat";
-import { AGENDA, FE_DAY, formatFeDayTimeDisplay, KIND_META, OPEN_AGENDA_SLOTS, PITCHABLE_TALK_TYPES } from "@/lib/feday-data";
+import { KIND_META, PITCHABLE_TALK_TYPES } from "@/lib/feday-data";
 import type { AssignedTalk } from "@/lib/agenda";
-import { getRemainingOpenSlotCount, resolveAgendaRow } from "@/lib/agenda";
+import { getOpenSlots, getRemainingOpenSlotCount, resolveAgendaRow } from "@/lib/agenda";
+import {
+  formatEventDateShort,
+  formatEventTimeRange,
+  type AgendaItem,
+  type EventRecord,
+} from "@/lib/events";
 import type { SessionUser } from "@/lib/auth/user";
 import type {
   AttendanceCounts,
@@ -17,6 +23,8 @@ import { TopBar } from "@/components/agenda/TopBar";
 import { AttendanceForm } from "@/components/agenda/AttendanceForm";
 
 type AgendaScreenProps = {
+  event: EventRecord;
+  items: AgendaItem[];
   user: SessionUser;
   isOrganiser?: boolean;
   signOutAction: () => void | Promise<void>;
@@ -27,6 +35,8 @@ type AgendaScreenProps = {
 };
 
 export function AgendaScreen({
+  event,
+  items,
   user,
   isOrganiser,
   signOutAction,
@@ -36,11 +46,12 @@ export function AgendaScreen({
   setAttendanceAction,
 }: AgendaScreenProps) {
   const firstName = user.name.split(/\s+/)[0]?.toUpperCase();
-  const remainingOpen = getRemainingOpenSlotCount(assignmentsBySlot);
+  const openSlotCount = getOpenSlots(items).length;
+  const remainingOpen = getRemainingOpenSlotCount(items, assignmentsBySlot);
 
   return (
     <div>
-      <TopBar user={user} isOrganiser={isOrganiser} signOutAction={signOutAction} />
+      <TopBar event={event} user={user} isOrganiser={isOrganiser} signOutAction={signOutAction} />
       <div className="wrap">
         <div className="row between" style={{ gap: 20, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
@@ -54,9 +65,9 @@ export function AgendaScreen({
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, margin: "22px 0 14px" }}>
-          <Stat k="DATE" v="JUL 1" />
-          <Stat k="TIME" v={formatFeDayTimeDisplay()} />
-          <Stat k="WHERE" v={FE_DAY.loc} />
+          <Stat k="DATE" v={formatEventDateShort(event)} />
+          <Stat k="TIME" v={formatEventTimeRange(event)} />
+          <Stat k="WHERE" v={event.location} />
         </div>
 
         {setAttendanceAction && (
@@ -91,7 +102,7 @@ export function AgendaScreen({
               </h3>
               <div className="txt" style={{ fontSize: 20 }}>
                 {remainingOpen > 0
-                  ? `${remainingOpen} of ${OPEN_AGENDA_SLOTS.length} talk slots still open. Grab one — pitch the thing you’ve been dying to share.`
+                  ? `${remainingOpen} of ${openSlotCount} talk slots still open. Grab one — pitch the thing you’ve been dying to share.`
                   : "Every talk and lightning slot is filled. See you on the day!"}
               </div>
             </div>
@@ -104,16 +115,16 @@ export function AgendaScreen({
         </PixelFrame>
 
         <div>
-          {AGENDA.map((row, i) => {
+          {items.map((row, i) => {
             const meta = KIND_META[row.kind];
-            const isLast = i === AGENDA.length - 1;
-            const assignment = row.id ? assignmentsBySlot[row.id] : undefined;
+            const isLast = i === items.length - 1;
+            const assignment = assignmentsBySlot[row.id];
             const resolved = resolveAgendaRow(row, assignment, meta.open);
             return (
-              <div className="ag-row" key={row.id ?? i}>
+              <div className="ag-row" key={row.id}>
                 <div className="ag-time">
-                  <span>{row.t}</span>
-                  <span style={{ color: "var(--ink-dim)" }}>{row.end}</span>
+                  <span>{row.startTime}</span>
+                  <span style={{ color: "var(--ink-dim)" }}>{row.endTime}</span>
                 </div>
                 <div className="ag-rail">
                   <div className="dot" style={{ background: meta.color }} />

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Press_Start_2P, VT323 } from "next/font/google";
 import "./globals.css";
+import { eventEdition } from "@/lib/events";
+import { getCurrentEvent } from "@/lib/events.server";
 
 const pressStart2P = Press_Start_2P({
   weight: "400",
@@ -14,11 +16,14 @@ const vt323 = VT323({
   variable: "--font-vt323",
 });
 
-export const metadata: Metadata = {
-  title: "FE Day 2026 · Pitch a Talk",
-  description:
-    "Cleo's Front-End chapter day. View the agenda and pitch a lightning talk or long talk.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const event = await getCurrentEvent();
+  return {
+    title: event ? `${event.title} ${eventEdition(event)} · Pitch a Talk` : "FE Day · Pitch a Talk",
+    description:
+      "Cleo's Front-End chapter day. View the agenda and pitch a lightning talk or long talk.",
+  };
+}
 
 export default function RootLayout({
   children,

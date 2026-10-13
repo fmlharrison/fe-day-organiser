@@ -5,9 +5,11 @@ import { requireUser } from "@/lib/auth/user";
 import { partitionAttendees } from "@/lib/attendance";
 import { getAllAttendance, getAttendanceCounts } from "@/lib/attendance.server";
 import { isOrganiser } from "@/lib/submissions";
+import { requireCurrentEvent } from "@/lib/events.server";
 
 export default async function AttendeesPage() {
   const user = await requireUser();
+  const event = await requireCurrentEvent();
   const [organiser, attendees, counts] = await Promise.all([
     isOrganiser(),
     getAllAttendance(),
@@ -17,6 +19,7 @@ export default async function AttendeesPage() {
 
   return (
     <AttendeesScreen
+      event={event}
       user={user}
       isOrganiser={organiser}
       signOutAction={signOut}

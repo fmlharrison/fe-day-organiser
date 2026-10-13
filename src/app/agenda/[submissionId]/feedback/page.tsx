@@ -5,6 +5,7 @@ import { TopBar } from "@/components/agenda/TopBar";
 import { FeedbackForm } from "@/components/feedback/FeedbackForm";
 import { getAssignmentsBySubmissionId } from "@/lib/agenda";
 import { requireUser } from "@/lib/auth/user";
+import { getAgendaItems, requireCurrentEvent } from "@/lib/events.server";
 import { getFeedbackForReviewer } from "@/lib/feedback.server";
 import { isOrganiser } from "@/lib/submissions";
 
@@ -21,18 +22,22 @@ export default async function FeedbackPage({ params }: FeedbackPageProps) {
 
   const assignment = assignments[submissionId];
 
-  const [organiser, feedback] = await Promise.all([
+  const event = await requireCurrentEvent();
+  const [organiser, items, feedback] = await Promise.all([
     isOrganiser(),
+    getAgendaItems(event.id),
     getFeedbackForReviewer(submissionId, user.id),
   ]);
+  const slotLabel = items.find((item) => item.id === assignment.slotId)?.title ?? "";
   const saveFeedbackForSubmission = saveFeedback.bind(null, submissionId);
 
   return (
     <div>
-      <TopBar user={user} isOrganiser={organiser} signOutAction={signOut} />
+      <TopBar event={event} user={user} isOrganiser={organiser} signOutAction={signOut} />
       <main className="wrap" style={{ maxWidth: 760 }}>
         <FeedbackForm
           assignment={assignment}
+          slotLabel={slotLabel}
           existingFeedback={feedback}
           saveAction={saveFeedbackForSubmission}
         />

@@ -1,9 +1,15 @@
 import { Coin } from "@/components/ui/Coin";
 import { Stat } from "@/components/ui/Stat";
 import { GoogleButton } from "@/components/ui/GoogleButton";
-import { FE_DAY } from "@/lib/feday-data";
+import {
+  eventEdition,
+  formatEventDateShort,
+  formatEventTimeRange,
+  type EventRecord,
+} from "@/lib/events";
 
 type LandingScreenProps = {
+  event: EventRecord;
   error?: string | null;
   signInAction: () => void | Promise<void>;
 };
@@ -18,7 +24,7 @@ function errorMessage(error: string | null | undefined): string | null {
   return null;
 }
 
-export function LandingScreen({ error, signInAction }: LandingScreenProps) {
+export function LandingScreen({ event, error, signInAction }: LandingScreenProps) {
   const message = errorMessage(error);
 
   return (
@@ -32,20 +38,20 @@ export function LandingScreen({ error, signInAction }: LandingScreenProps) {
         </div>
 
         <h1 style={{ fontSize: "clamp(40px, 11vw, 96px)", color: "var(--gold)", textShadow: "6px 6px 0 var(--shadow)", lineHeight: 1.15 }}>
-          {FE_DAY.title}
+          {event.title}
         </h1>
         <div className="pixel" style={{ fontSize: "clamp(16px,4vw,30px)", color: "var(--orange)", marginTop: 4, textShadow: "4px 4px 0 var(--shadow)" }}>
-          {FE_DAY.year}
+          {eventEdition(event)}
         </div>
 
         <div className="txt-lg" style={{ color: "var(--ink-dim)", marginTop: 22, fontSize: 24 }}>
-          {FE_DAY.tagline}
+          {event.tagline}
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, margin: "34px 0 32px" }}>
-          <Stat k="WHEN" v="JUL 1" />
-          <Stat k="TIME" v="10–17" />
-          <Stat k="WHERE" v="LION'S SHARE" />
+          <Stat k="WHEN" v={formatEventDateShort(event)} />
+          <Stat k="TIME" v={formatEventTimeRange(event)} />
+          <Stat k="WHERE" v={event.location} />
         </div>
 
         <div className="pixel blink" style={{ fontSize: 14, color: "var(--ink)", marginBottom: 22 }}>

@@ -1,11 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import {
-  OPEN_AGENDA_SLOTS,
-  OPEN_SLOT_IDS,
-  SLOT_BY_ID,
-  type AgendaRow,
-} from "@/lib/feday-data";
-import type { TalkTypeId } from "@/lib/feday-data";
+import { KIND_META, type TalkTypeId } from "@/lib/feday-data";
+import type { AgendaItem } from "@/lib/events";
 
 export type AssignedTalk = {
   slotId: string;
@@ -35,7 +30,7 @@ type SubmissionJoin = {
 };
 
 type AssignmentJoinRow = {
-  slot_id: string;
+  agenda_item_id: string;
   submission_id: string;
   talk_submissions: SubmissionJoin | SubmissionJoin[] | null;
 };
@@ -51,7 +46,7 @@ function mapAssignmentRow(row: AssignmentJoinRow): AssignedTalk | null {
   const sub = normalizeSubmission(row.talk_submissions);
   if (!sub) return null;
   return {
-    slotId: row.slot_id,
+    slotId: row.agenda_item_id,
     submissionId: sub.id,
     title: sub.title,
     description: sub.description,
@@ -66,7 +61,7 @@ export async function getAgendaAssignments(): Promise<Record<string, AssignedTal
   const { data } = await supabase
     .from("agenda_assignments")
     .select(
-      "slot_id, submission_id, talk_submissions ( id, title, description, submitter_name, team, type )",
+      "agenda_item_id, submission_id, talk_submissions ( id, title, description, submitter_name, team, type )",
     );
 
   const bySlot: Record<string, AssignedTalk> = {};
@@ -86,8 +81,12 @@ export async function getAssignmentsBySubmissionId(): Promise<Record<string, Ass
   return bySubmission;
 }
 
+export function getOpenSlots(items: AgendaItem[]): AgendaItem[] {
+  return items.filter((item) => KIND_META[item.kind].open);
+}
+
 export function resolveAgendaRow(
-  row: AgendaRow,
+  row: AgendaItem,
   assignment: AssignedTalk | undefined,
   isOpen: boolean,
 ): ResolvedAgendaRow {
@@ -103,33 +102,24 @@ export function resolveAgendaRow(
 
   return {
     title: row.title,
-    desc: row.desc,
+    desc: row.description,
     isFilled: false,
     showClaimLink: isOpen,
   };
 }
 
-export function getOrphanedAssignments(
-  assignmentsBySlot: Record<string, AssignedTalk>,
-): AssignedTalk[] {
-  return Object.values(assignmentsBySlot).filter(
-    (assignment) => !OPEN_SLOT_IDS.has(assignment.slotId),
-  );
-}
-
 export function getRemainingOpenSlotCount(
+  items: AgendaItem[],
   assignmentsBySlot: Record<string, AssignedTalk>,
 ): number {
-  const filledOpenSlots = Object.keys(assignmentsBySlot).filter((slotId) =>
-    OPEN_SLOT_IDS.has(slotId),
-  ).length;
-  return OPEN_AGENDA_SLOTS.length - filledOpenSlots;
+  return getOpenSlots(items).filter((slot) => !assignmentsBySlot[slot.id]).length;
 }
 
 export function isPitchingClosed(
+  items: AgendaItem[],
   assignmentsBySlot: Record<string, AssignedTalk>,
 ): boolean {
-  return getRemainingOpenSlotCount(assignmentsBySlot) === 0;
+  return getRemainingOpenSlotCount(items, assignmentsBySlot) === 0;
 }
 
 export type AssignmentValidationResult = { ok: true } | { ok: false; formError: string };
@@ -138,17 +128,18 @@ export function validateAssignment(params: {
   slotId: string;
   submissionId: string;
   submissionType: TalkTypeId;
+  items: AgendaItem[];
   assignmentsBySlot: Record<string, AssignedTalk>;
 }): AssignmentValidationResult {
-  const openSlot = OPEN_AGENDA_SLOTS.find((row) => row.id === params.slotId);
-  if (!openSlot) {
-    if (SLOT_BY_ID[params.slotId]) {
-      return { ok: false, formError: "That agenda slot is no longer available." };
-    }
+  const slot = params.items.find((item) => item.id === params.slotId);
+  if (!slot) {
     return { ok: false, formError: "That agenda slot doesn't exist." };
   }
+  if (!KIND_META[slot.kind].open) {
+    return { ok: false, formError: "That agenda slot isn't open for talks." };
+  }
 
-  if (params.submissionType !== openSlot.kind) {
+  if (params.submissionType !== slot.kind) {
     return { ok: false, formError: "Talk type doesn't match the slot type." };
   }
 

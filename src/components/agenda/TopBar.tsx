@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { Btn } from "@/components/ui/Btn";
 import type { SessionUser } from "@/lib/auth/user";
+import { eventBrand, type EventRecord } from "@/lib/events";
 
 type TopBarProps = {
+  event: EventRecord;
   user: SessionUser;
   isOrganiser?: boolean;
   signOutAction: () => void | Promise<void>;
@@ -18,13 +20,13 @@ function deriveInitials(name: string): string {
     .toUpperCase();
 }
 
-export function TopBar({ user, isOrganiser, signOutAction }: TopBarProps) {
+export function TopBar({ event, user, isOrganiser, signOutAction }: TopBarProps) {
   const initials = deriveInitials(user.name);
 
   return (
     <div className="topbar">
       <Link href="/agenda" className="brand">
-        FE DAY ’26
+        {eventBrand(event)}
       </Link>
       <div className="row" style={{ gap: 14 }}>
         <Link href="/agenda" className="btn ghost sm">

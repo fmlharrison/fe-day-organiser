@@ -3,12 +3,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   feedbackForm: vi.fn(() => null),
+  getAgendaItems: vi.fn(),
   getAssignmentsBySubmissionId: vi.fn(),
   getFeedbackForReviewer: vi.fn(),
   isOrganiser: vi.fn(),
   notFound: vi.fn(() => {
     throw new Error("NEXT_NOT_FOUND");
   }),
+  requireCurrentEvent: vi.fn(),
   requireUser: vi.fn(),
   topBar: vi.fn(() => null),
 }));
@@ -26,12 +28,17 @@ vi.mock("@/lib/agenda", () => ({
   getAssignmentsBySubmissionId: mocks.getAssignmentsBySubmissionId,
 }));
 vi.mock("@/lib/auth/user", () => ({ requireUser: mocks.requireUser }));
+vi.mock("@/lib/events.server", () => ({
+  getAgendaItems: mocks.getAgendaItems,
+  requireCurrentEvent: mocks.requireCurrentEvent,
+}));
 vi.mock("@/lib/feedback.server", () => ({
   getFeedbackForReviewer: mocks.getFeedbackForReviewer,
 }));
 vi.mock("@/lib/submissions", () => ({ isOrganiser: mocks.isOrganiser }));
 
 import FeedbackPage from "@/app/agenda/[submissionId]/feedback/page";
+import { julyAgenda, julyEvent } from "@/test/fixtures";
 
 const submissionId = "11111111-1111-4111-8111-111111111111";
 const reviewer = {
@@ -53,6 +60,8 @@ describe("FeedbackPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.requireUser.mockResolvedValue(reviewer);
+    mocks.requireCurrentEvent.mockResolvedValue(julyEvent);
+    mocks.getAgendaItems.mockResolvedValue(julyAgenda);
     mocks.getAssignmentsBySubmissionId.mockResolvedValue({
       [submissionId]: assignment,
     });
@@ -69,7 +78,7 @@ describe("FeedbackPage", () => {
       reviewer.id,
     );
     expect(mocks.feedbackForm).toHaveBeenCalledWith(
-      expect.objectContaining({ assignment, existingFeedback: null }),
+      expect.objectContaining({ assignment, slotLabel: "Talk Slot #1", existingFeedback: null }),
       undefined,
     );
   });

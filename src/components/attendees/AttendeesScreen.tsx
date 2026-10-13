@@ -3,6 +3,7 @@ import { AttendanceForm } from "@/components/agenda/AttendanceForm";
 import { AttendeeList } from "@/components/attendees/AttendeeList";
 import type { AttendanceResult } from "@/app/attendees/actions";
 import type { SessionUser } from "@/lib/auth/user";
+import type { EventRecord } from "@/lib/events";
 import type {
   AttendanceCounts,
   AttendanceMode,
@@ -10,6 +11,7 @@ import type {
 } from "@/lib/attendance";
 
 type AttendeesScreenProps = {
+  event: EventRecord;
   user: SessionUser;
   isOrganiser?: boolean;
   signOutAction: () => void | Promise<void>;
@@ -20,6 +22,7 @@ type AttendeesScreenProps = {
 };
 
 export function AttendeesScreen({
+  event,
   user,
   isOrganiser,
   signOutAction,
@@ -32,7 +35,7 @@ export function AttendeesScreen({
 
   return (
     <div>
-      <TopBar user={user} isOrganiser={isOrganiser} signOutAction={signOutAction} />
+      <TopBar event={event} user={user} isOrganiser={isOrganiser} signOutAction={signOutAction} />
       <div className="wrap">
         <div className="pixel" style={{ fontSize: 10, color: "var(--teal)", marginBottom: 12 }}>
           PLAYER {firstName}

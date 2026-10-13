@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AttendeesScreen } from "@/components/attendees/AttendeesScreen";
+import { julyEvent } from "@/test/fixtures";
 
 const noop = () => {};
 
@@ -20,6 +21,7 @@ describe("AttendeesScreen", () => {
   it("renders the page heading and summary counts", () => {
     render(
       <AttendeesScreen
+        event={julyEvent}
         user={user}
         signOutAction={noop}
         attendance={null}
@@ -36,6 +38,7 @@ describe("AttendeesScreen", () => {
   it("shows the RSVP form when the user has not RSVP'd", () => {
     render(
       <AttendeesScreen
+        event={julyEvent}
         user={user}
         signOutAction={noop}
         attendance={null}
@@ -51,6 +54,7 @@ describe("AttendeesScreen", () => {
   it("lists other attendees but not the current user", () => {
     render(
       <AttendeesScreen
+        event={julyEvent}
         user={user}
         signOutAction={noop}
         attendance={{
@@ -73,6 +77,7 @@ describe("AttendeesScreen", () => {
   it("shows the chapter empty state when no one else has RSVP'd", () => {
     render(
       <AttendeesScreen
+        event={julyEvent}
         user={user}
         signOutAction={noop}
         attendance={null}

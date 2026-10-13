@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MyPitchesScreen } from "@/components/submissions/MyPitchesScreen";
 import type { TalkSubmissionRow } from "@/lib/submissions";
+import { julyAgenda, julyEvent } from "@/test/fixtures";
 
 const noop = () => {};
 
@@ -35,6 +36,8 @@ describe("MyPitchesScreen", () => {
     it("renders the MY PITCHES heading", () => {
       render(
         <MyPitchesScreen
+          event={julyEvent}
+          items={julyAgenda}
           user={user}
           signOutAction={noop}
           submissions={rows}
@@ -50,6 +53,8 @@ describe("MyPitchesScreen", () => {
     it("renders each submission title", () => {
       render(
         <MyPitchesScreen
+          event={julyEvent}
+          items={julyAgenda}
           user={user}
           signOutAction={noop}
           submissions={rows}
@@ -63,7 +68,7 @@ describe("MyPitchesScreen", () => {
   describe("empty state", () => {
     it("shows no submission titles when the user has no pitches", () => {
       render(
-        <MyPitchesScreen user={user} signOutAction={noop} submissions={[]} />,
+        <MyPitchesScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} submissions={[]} />,
       );
       expect(screen.queryByText("Deleting 40% Of Our CSS")).toBeNull();
       expect(screen.queryByText("Tiny Wins")).toBeNull();
@@ -71,7 +76,7 @@ describe("MyPitchesScreen", () => {
 
     it("offers a way to pitch a talk via a link to /pitch", () => {
       render(
-        <MyPitchesScreen user={user} signOutAction={noop} submissions={[]} />,
+        <MyPitchesScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} submissions={[]} />,
       );
       const pitchLinks = screen
         .getAllByRole("link")
@@ -82,6 +87,8 @@ describe("MyPitchesScreen", () => {
     it("does not offer a pitch link when pitching is closed", () => {
       render(
         <MyPitchesScreen
+          event={julyEvent}
+          items={julyAgenda}
           user={user}
           signOutAction={noop}
           submissions={[]}

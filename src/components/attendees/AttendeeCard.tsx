@@ -42,7 +42,7 @@ export function AttendeeCard({ attendee, showEmail = false, highlighted = false 
             {attendee.attendeeEmail}
           </div>
           <div className="txt-sm" style={{ marginTop: 4, color: "var(--ink-dim)" }}>
-            RSVP'd {formatRsvpDate(attendee.updatedAt)}
+            RSVP&apos;d {formatRsvpDate(attendee.updatedAt)}
           </div>
         </>
       )}
