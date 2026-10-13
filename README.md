@@ -43,6 +43,7 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
    - [`supabase/migrations/0005_talk_feedback.sql`](supabase/migrations/0005_talk_feedback.sql) — reviewer-owned ratings and comments for assigned talks
    - [`supabase/migrations/0006_events_and_agenda_items.sql`](supabase/migrations/0006_events_and_agenda_items.sql) — events and their agenda items, seeded with the July 2026 event
    - [`supabase/migrations/0007_assignments_to_agenda_items.sql`](supabase/migrations/0007_assignments_to_agenda_items.sql) — point talk assignments at agenda items; let signed-out visitors read event details
+   - [`supabase/migrations/0008_event_scoped_data.sql`](supabase/migrations/0008_event_scoped_data.sql) — scope pitches, assignments and RSVPs to an event
 4. **Enable Google auth.** In Supabase: *Authentication → Providers → Google*. Create a Google
    OAuth client in the Google Cloud Console, set its authorized redirect URI to
    `https://<your-project-ref>.supabase.co/auth/v1/callback`, and paste the client ID/secret

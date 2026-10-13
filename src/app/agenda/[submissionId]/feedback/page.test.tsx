@@ -73,6 +73,7 @@ describe("FeedbackPage", () => {
     render(await FeedbackPage({ params: Promise.resolve({ submissionId }) }));
 
     expect(mocks.requireUser).toHaveBeenCalledTimes(1);
+    expect(mocks.getAssignmentsBySubmissionId).toHaveBeenCalledWith(julyEvent.id);
     expect(mocks.getFeedbackForReviewer).toHaveBeenCalledWith(
       submissionId,
       reviewer.id,

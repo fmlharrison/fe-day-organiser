@@ -12,8 +12,8 @@ export default async function AttendeesPage() {
   const event = await requireCurrentEvent();
   const [organiser, attendees, counts] = await Promise.all([
     isOrganiser(),
-    getAllAttendance(),
-    getAttendanceCounts(),
+    getAllAttendance(event.id),
+    getAttendanceCounts(event.id),
   ]);
   const { mine, others } = partitionAttendees(attendees, user.id);
 

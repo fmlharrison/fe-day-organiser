@@ -19,30 +19,38 @@ function mapAttendanceRow(row: AttendanceRow): AttendanceRecord {
   };
 }
 
-export async function getAttendanceForUser(userId: string): Promise<AttendanceRecord | null> {
+export async function getAttendanceForUser(
+  eventId: string,
+  userId: string,
+): Promise<AttendanceRecord | null> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("event_attendance")
     .select("user_id, attendee_name, attendee_email, mode, updated_at")
+    .eq("event_id", eventId)
     .eq("user_id", userId)
     .maybeSingle();
 
   return data ? mapAttendanceRow(data as AttendanceRow) : null;
 }
 
-export async function getAllAttendance(): Promise<AttendanceRecord[]> {
+export async function getAllAttendance(eventId: string): Promise<AttendanceRecord[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("event_attendance")
     .select("user_id, attendee_name, attendee_email, mode, updated_at")
+    .eq("event_id", eventId)
     .order("attendee_name", { ascending: true });
 
   return (data ?? []).map((row) => mapAttendanceRow(row as AttendanceRow));
 }
 
-export async function getAttendanceCounts(): Promise<AttendanceCounts> {
+export async function getAttendanceCounts(eventId: string): Promise<AttendanceCounts> {
   const supabase = await createClient();
-  const { data } = await supabase.from("event_attendance").select("mode");
+  const { data } = await supabase
+    .from("event_attendance")
+    .select("mode")
+    .eq("event_id", eventId);
 
   let inPerson = 0;
   let remote = 0;

@@ -31,7 +31,7 @@ export async function submitTalk(input: TalkSubmissionInput): Promise<SubmitResu
 
   const [items, assignments] = await Promise.all([
     getAgendaItems(event.id),
-    getAgendaAssignments(),
+    getAgendaAssignments(event.id),
   ]);
   if (isPitchingClosed(items, assignments)) {
     return {
@@ -44,6 +44,7 @@ export async function submitTalk(input: TalkSubmissionInput): Promise<SubmitResu
   const supabase = await createClient();
   // submitter_email and user_id come from the session, never the form input.
   const { error } = await supabase.from("talk_submissions").insert({
+    event_id: event.id,
     user_id: user.id,
     submitter_name: input.name.trim(),
     submitter_email: user.email,

@@ -20,7 +20,7 @@ export async function isOrganiser(): Promise<boolean> {
   return (data?.length ?? 0) > 0;
 }
 
-export async function getMySubmissions(): Promise<TalkSubmissionRow[]> {
+export async function getMySubmissions(eventId: string): Promise<TalkSubmissionRow[]> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -33,6 +33,7 @@ export async function getMySubmissions(): Promise<TalkSubmissionRow[]> {
     .from("talk_submissions")
     .select("id, created_at, submitter_name, submitter_email, team, type, title, description")
     .eq("user_id", user.id)
+    .eq("event_id", eventId)
     .order("created_at", { ascending: false });
 
   return (data ?? []) as TalkSubmissionRow[];
@@ -40,11 +41,12 @@ export async function getMySubmissions(): Promise<TalkSubmissionRow[]> {
 
 // Relies on the organiser select-all RLS policy; only ever called from the
 // organiser-gated admin page.
-export async function getAllSubmissions(): Promise<TalkSubmissionRow[]> {
+export async function getAllSubmissions(eventId: string): Promise<TalkSubmissionRow[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("talk_submissions")
     .select("id, created_at, submitter_name, submitter_email, team, type, title, description")
+    .eq("event_id", eventId)
     .order("created_at", { ascending: false });
 
   return (data ?? []) as TalkSubmissionRow[];

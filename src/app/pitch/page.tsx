@@ -17,7 +17,7 @@ export default async function PitchPage({ searchParams }: PitchPageProps) {
   const [organiser, items, assignmentsBySlot] = await Promise.all([
     isOrganiser(),
     getAgendaItems(event.id),
-    getAgendaAssignments(),
+    getAgendaAssignments(event.id),
   ]);
   const pitchingClosed = isPitchingClosed(items, assignmentsBySlot);
   const t = (await searchParams).type;

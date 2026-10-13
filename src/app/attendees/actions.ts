@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/user";
+import { getCurrentEvent } from "@/lib/events.server";
 import { isAttendanceMode, type AttendanceMode } from "@/lib/attendance";
 
 export type AttendanceResult = { ok: true; mode: AttendanceMode } | { ok: false; formError: string };
@@ -17,16 +18,22 @@ export async function setAttendance(mode: string): Promise<AttendanceResult> {
     return { ok: false, formError: "Your session expired. Please sign in again." };
   }
 
+  const event = await getCurrentEvent();
+  if (!event) {
+    return { ok: false, formError: "There's no event to RSVP to right now." };
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.from("event_attendance").upsert(
     {
+      event_id: event.id,
       user_id: user.id,
       attendee_name: user.name,
       attendee_email: user.email,
       mode,
       updated_at: new Date().toISOString(),
     },
-    { onConflict: "user_id" },
+    { onConflict: "event_id,user_id" },
   );
 
   if (error) {
