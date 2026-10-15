@@ -23,25 +23,26 @@ export async function assignSubmissionToSlot(
     return { ok: false, formError: "Your session expired. Please sign in again." };
   }
 
+  const event = await getCurrentEvent();
+  if (!event) {
+    return { ok: false, formError: "There's no event to assign talks to." };
+  }
+
   const supabase = await createClient();
   const { data: submission, error: fetchError } = await supabase
     .from("talk_submissions")
     .select("id, type")
     .eq("id", submissionId)
+    .eq("event_id", event.id)
     .maybeSingle();
 
   if (fetchError || !submission) {
     return { ok: false, formError: "Couldn't find that submission." };
   }
 
-  const event = await getCurrentEvent();
-  if (!event) {
-    return { ok: false, formError: "There's no event to assign talks to." };
-  }
-
   const [items, assignments] = await Promise.all([
     getAgendaItems(event.id),
-    getAgendaAssignments(),
+    getAgendaAssignments(event.id),
   ]);
   const validation = validateAssignment({
     slotId,
@@ -55,6 +56,7 @@ export async function assignSubmissionToSlot(
   }
 
   const { error } = await supabase.from("agenda_assignments").insert({
+    event_id: event.id,
     agenda_item_id: slotId,
     submission_id: submissionId,
     assigned_by: user.id,

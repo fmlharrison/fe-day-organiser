@@ -16,13 +16,13 @@ type FeedbackPageProps = {
 export default async function FeedbackPage({ params }: FeedbackPageProps) {
   const user = await requireUser();
   const { submissionId } = await params;
-  const assignments = await getAssignmentsBySubmissionId();
+  const event = await requireCurrentEvent();
+  const assignments = await getAssignmentsBySubmissionId(event.id);
 
   if (!Object.prototype.hasOwnProperty.call(assignments, submissionId)) notFound();
 
   const assignment = assignments[submissionId];
 
-  const event = await requireCurrentEvent();
   const [organiser, items, feedback] = await Promise.all([
     isOrganiser(),
     getAgendaItems(event.id),

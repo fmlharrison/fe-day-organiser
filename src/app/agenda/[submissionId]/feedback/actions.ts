@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getAssignmentsBySubmissionId } from "@/lib/agenda";
 import { getSessionUser } from "@/lib/auth/user";
+import { getCurrentEvent } from "@/lib/events.server";
 import {
   isFeedbackValid,
   normalizeFeedbackComments,
@@ -41,7 +42,8 @@ export async function saveFeedback(
     };
   }
 
-  const assignments = await getAssignmentsBySubmissionId();
+  const event = await getCurrentEvent();
+  const assignments = event ? await getAssignmentsBySubmissionId(event.id) : {};
   if (!Object.prototype.hasOwnProperty.call(assignments, submissionId)) {
     return {
       ok: false,

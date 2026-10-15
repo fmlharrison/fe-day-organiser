@@ -15,11 +15,11 @@ export default async function AdminPage() {
   const [items, submissions, assignmentsBySlot, assignmentsBySubmission, attendees, attendanceCounts] =
     await Promise.all([
       getAgendaItems(event.id),
-      getAllSubmissions(),
-      getAgendaAssignments(),
-      getAssignmentsBySubmissionId(),
-      getAllAttendance(),
-      getAttendanceCounts(),
+      getAllSubmissions(event.id),
+      getAgendaAssignments(event.id),
+      getAssignmentsBySubmissionId(event.id),
+      getAllAttendance(event.id),
+      getAttendanceCounts(event.id),
     ]);
 
   return (

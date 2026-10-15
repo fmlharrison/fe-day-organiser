@@ -13,9 +13,9 @@ export default async function AgendaPage() {
   const [organiser, items, assignmentsBySlot, attendance, attendanceCounts] = await Promise.all([
     isOrganiser(),
     getAgendaItems(event.id),
-    getAgendaAssignments(),
-    getAttendanceForUser(user.id),
-    getAttendanceCounts(),
+    getAgendaAssignments(event.id),
+    getAttendanceForUser(event.id, user.id),
+    getAttendanceCounts(event.id),
   ]);
   return (
     <AgendaScreen

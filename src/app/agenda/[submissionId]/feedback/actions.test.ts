@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
   from: vi.fn(),
   getAssignmentsBySubmissionId: vi.fn(),
+  getCurrentEvent: vi.fn(),
   getSessionUser: vi.fn(),
   revalidatePath: vi.fn(),
   select: vi.fn(),
@@ -24,11 +25,16 @@ vi.mock("@/lib/agenda", () => ({
   getAssignmentsBySubmissionId: mocks.getAssignmentsBySubmissionId,
 }));
 
+vi.mock("@/lib/events.server", () => ({
+  getCurrentEvent: mocks.getCurrentEvent,
+}));
+
 vi.mock("next/cache", () => ({
   revalidatePath: mocks.revalidatePath,
 }));
 
 import { saveFeedback as saveTalkFeedback } from "@/app/agenda/[submissionId]/feedback/actions";
+import { julyEvent } from "@/test/fixtures";
 
 const submissionId = "11111111-1111-4111-8111-111111111111";
 const reviewerId = "22222222-2222-4222-8222-222222222222";
@@ -61,6 +67,7 @@ describe("saveTalkFeedback", () => {
       email: "reviewer@meetcleo.com",
       name: "Grace Reviewer",
     });
+    mocks.getCurrentEvent.mockResolvedValue(julyEvent);
     mocks.getAssignmentsBySubmissionId.mockResolvedValue({
       [submissionId]: assignment,
     });
@@ -108,6 +115,22 @@ describe("saveTalkFeedback", () => {
     expect(result).toHaveProperty("formError");
     expect(mocks.createClient).not.toHaveBeenCalled();
     expect(mocks.revalidatePath).not.toHaveBeenCalled();
+  });
+
+  it("only accepts talks assigned in the current event", async () => {
+    await saveTalkFeedback(submissionId, { rating: 4 });
+
+    expect(mocks.getAssignmentsBySubmissionId).toHaveBeenCalledWith(julyEvent.id);
+  });
+
+  it("rejects feedback when there is no current event", async () => {
+    mocks.getCurrentEvent.mockResolvedValue(null);
+
+    const result = await saveTalkFeedback(submissionId, { rating: 4 });
+
+    expect(result).toMatchObject({ ok: false, errors: {} });
+    expect(result).toHaveProperty("formError");
+    expect(mocks.createClient).not.toHaveBeenCalled();
   });
 
   it.each([

@@ -11,9 +11,9 @@ export default async function MyPitchesPage() {
   const [organiser, items, submissions, assignmentsBySubmission, assignmentsBySlot] = await Promise.all([
     isOrganiser(),
     getAgendaItems(event.id),
-    getMySubmissions(),
-    getAssignmentsBySubmissionId(),
-    getAgendaAssignments(),
+    getMySubmissions(event.id),
+    getAssignmentsBySubmissionId(event.id),
+    getAgendaAssignments(event.id),
   ]);
   return (
     <MyPitchesScreen

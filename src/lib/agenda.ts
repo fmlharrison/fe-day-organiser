@@ -56,13 +56,16 @@ function mapAssignmentRow(row: AssignmentJoinRow): AssignedTalk | null {
   };
 }
 
-export async function getAgendaAssignments(): Promise<Record<string, AssignedTalk>> {
+export async function getAgendaAssignments(
+  eventId: string,
+): Promise<Record<string, AssignedTalk>> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("agenda_assignments")
     .select(
       "agenda_item_id, submission_id, talk_submissions ( id, title, description, submitter_name, team, type )",
-    );
+    )
+    .eq("event_id", eventId);
 
   const bySlot: Record<string, AssignedTalk> = {};
   for (const row of data ?? []) {
@@ -72,8 +75,10 @@ export async function getAgendaAssignments(): Promise<Record<string, AssignedTal
   return bySlot;
 }
 
-export async function getAssignmentsBySubmissionId(): Promise<Record<string, AssignedTalk>> {
-  const bySlot = await getAgendaAssignments();
+export async function getAssignmentsBySubmissionId(
+  eventId: string,
+): Promise<Record<string, AssignedTalk>> {
+  const bySlot = await getAgendaAssignments(eventId);
   const bySubmission: Record<string, AssignedTalk> = {};
   for (const assignment of Object.values(bySlot)) {
     bySubmission[assignment.submissionId] = assignment;
