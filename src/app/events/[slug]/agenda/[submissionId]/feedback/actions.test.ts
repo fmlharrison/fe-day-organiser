@@ -5,7 +5,7 @@ const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
   from: vi.fn(),
   getAssignmentsBySubmissionId: vi.fn(),
-  getCurrentEvent: vi.fn(),
+  getEventBySlug: vi.fn(),
   getSessionUser: vi.fn(),
   revalidatePath: vi.fn(),
   select: vi.fn(),
@@ -26,19 +26,19 @@ vi.mock("@/lib/agenda", () => ({
 }));
 
 vi.mock("@/lib/events.server", () => ({
-  getCurrentEvent: mocks.getCurrentEvent,
+  getEventBySlug: mocks.getEventBySlug,
 }));
 
 vi.mock("next/cache", () => ({
   revalidatePath: mocks.revalidatePath,
 }));
 
-import { saveFeedback as saveTalkFeedback } from "@/app/agenda/[submissionId]/feedback/actions";
+import { saveFeedback as saveTalkFeedback } from "@/app/events/[slug]/agenda/[submissionId]/feedback/actions";
 import { julyEvent } from "@/test/fixtures";
 
 const submissionId = "11111111-1111-4111-8111-111111111111";
 const reviewerId = "22222222-2222-4222-8222-222222222222";
-const route = `/agenda/${submissionId}/feedback`;
+const route = `/events/july-2026/agenda/${submissionId}/feedback`;
 
 const assignment = {
   slotId: "talk-1",
@@ -67,7 +67,7 @@ describe("saveTalkFeedback", () => {
       email: "reviewer@meetcleo.com",
       name: "Grace Reviewer",
     });
-    mocks.getCurrentEvent.mockResolvedValue(julyEvent);
+    mocks.getEventBySlug.mockResolvedValue(julyEvent);
     mocks.getAssignmentsBySubmissionId.mockResolvedValue({
       [submissionId]: assignment,
     });
@@ -79,7 +79,7 @@ describe("saveTalkFeedback", () => {
   });
 
   it("short-circuits invalid input before authentication or persistence", async () => {
-    const result = await saveTalkFeedback(submissionId, { rating: 0 });
+    const result = await saveTalkFeedback("july-2026", submissionId, { rating: 0 });
 
     expect(result).toEqual({
       ok: false,
@@ -94,7 +94,7 @@ describe("saveTalkFeedback", () => {
   it("rejects an expired session before checking assignments", async () => {
     mocks.getSessionUser.mockResolvedValue(null);
 
-    const result = await saveTalkFeedback(submissionId, { rating: 4 });
+    const result = await saveTalkFeedback("july-2026", submissionId, { rating: 4 });
 
     expect(result).toEqual({
       ok: false,
@@ -109,7 +109,7 @@ describe("saveTalkFeedback", () => {
     const inheritedAssignment = Object.create({ [submissionId]: assignment });
     mocks.getAssignmentsBySubmissionId.mockResolvedValue(inheritedAssignment);
 
-    const result = await saveTalkFeedback(submissionId, { rating: 4 });
+    const result = await saveTalkFeedback("july-2026", submissionId, { rating: 4 });
 
     expect(result).toMatchObject({ ok: false, errors: {} });
     expect(result).toHaveProperty("formError");
@@ -117,16 +117,16 @@ describe("saveTalkFeedback", () => {
     expect(mocks.revalidatePath).not.toHaveBeenCalled();
   });
 
-  it("only accepts talks assigned in the current event", async () => {
-    await saveTalkFeedback(submissionId, { rating: 4 });
+  it("only accepts talks assigned in the event", async () => {
+    await saveTalkFeedback("july-2026", submissionId, { rating: 4 });
 
     expect(mocks.getAssignmentsBySubmissionId).toHaveBeenCalledWith(julyEvent.id);
   });
 
-  it("rejects feedback when there is no current event", async () => {
-    mocks.getCurrentEvent.mockResolvedValue(null);
+  it("rejects feedback when the event doesn't exist", async () => {
+    mocks.getEventBySlug.mockResolvedValue(null);
 
-    const result = await saveTalkFeedback(submissionId, { rating: 4 });
+    const result = await saveTalkFeedback("july-2026", submissionId, { rating: 4 });
 
     expect(result).toMatchObject({ ok: false, errors: {} });
     expect(result).toHaveProperty("formError");
@@ -143,7 +143,7 @@ describe("saveTalkFeedback", () => {
       reviewer_id: "forged-reviewer-id",
     } as FeedbackInput;
 
-    await saveTalkFeedback(submissionId, input);
+    await saveTalkFeedback("july-2026", submissionId, input);
 
     expect(mocks.from).toHaveBeenCalledWith("talk_feedback");
     expect(mocks.upsert).toHaveBeenCalledWith(
@@ -162,7 +162,7 @@ describe("saveTalkFeedback", () => {
   });
 
   it("selects, maps, and returns the saved feedback row", async () => {
-    const result = await saveTalkFeedback(submissionId, {
+    const result = await saveTalkFeedback("july-2026", submissionId, {
       rating: 4,
       comments: "Useful examples.",
     });
@@ -188,7 +188,7 @@ describe("saveTalkFeedback", () => {
       error: { message: "database unavailable" },
     });
 
-    const result = await saveTalkFeedback(submissionId, { rating: 4 });
+    const result = await saveTalkFeedback("july-2026", submissionId, { rating: 4 });
 
     expect(result).toEqual({
       ok: false,
@@ -199,7 +199,7 @@ describe("saveTalkFeedback", () => {
   });
 
   it("revalidates exactly the saved feedback route", async () => {
-    await saveTalkFeedback(submissionId, { rating: 4 });
+    await saveTalkFeedback("july-2026", submissionId, { rating: 4 });
 
     expect(mocks.revalidatePath).toHaveBeenCalledTimes(1);
     expect(mocks.revalidatePath).toHaveBeenCalledWith(route);

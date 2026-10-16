@@ -13,7 +13,7 @@ const TEAM_PLACEHOLDER = /e\.g\. Web Platform/i;
 describe("PitchForm", () => {
   describe("pitching closed", () => {
     it("shows a closed message instead of the form", () => {
-      render(<PitchForm userName="Ada Pixel" pitchingClosed submitAction={vi.fn()} />);
+      render(<PitchForm eventSlug="july-2026" userName="Ada Pixel" pitchingClosed submitAction={vi.fn()} />);
       expect(screen.getByRole("heading", { name: /pitching closed/i })).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: /submit idea/i })).toBeNull();
     });
@@ -21,7 +21,7 @@ describe("PitchForm", () => {
 
   describe("prefill", () => {
     it("prefills the name field from userName", () => {
-      render(<PitchForm userName="Ada Pixel" submitAction={vi.fn()} />);
+      render(<PitchForm eventSlug="july-2026" userName="Ada Pixel" submitAction={vi.fn()} />);
       expect(screen.getByDisplayValue("Ada Pixel")).toBeInTheDocument();
     });
   });
@@ -30,7 +30,7 @@ describe("PitchForm", () => {
     it("does not call submitAction and surfaces inline errors when required fields are empty", async () => {
       const user = userEvent.setup();
       const submitAction = vi.fn();
-      render(<PitchForm userName="" submitAction={submitAction} />);
+      render(<PitchForm eventSlug="july-2026" userName="" submitAction={submitAction} />);
 
       await user.click(
         screen.getByRole("button", { name: /submit idea/i }),
@@ -53,7 +53,7 @@ describe("PitchForm", () => {
           team: "Web Platform",
         },
       });
-      render(<PitchForm userName="Ada Pixel" submitAction={submitAction} />);
+      render(<PitchForm eventSlug="july-2026" userName="Ada Pixel" submitAction={submitAction} />);
 
       // Pick the LONG TALK slot type by its card.
       await user.click(screen.getByRole("button", { name: /long talk/i }));
@@ -93,6 +93,7 @@ describe("PitchForm", () => {
       });
       render(
         <PitchForm
+          eventSlug="july-2026"
           userName="Ada Pixel"
           presetType="lightning"
           submitAction={submitAction}

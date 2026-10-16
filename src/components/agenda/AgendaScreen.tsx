@@ -12,13 +12,14 @@ import {
   type AgendaItem,
   type EventRecord,
 } from "@/lib/events";
+import { eventPath } from "@/lib/routes";
 import type { SessionUser } from "@/lib/auth/user";
 import type {
   AttendanceCounts,
   AttendanceMode,
   AttendanceRecord,
 } from "@/lib/attendance";
-import type { AttendanceResult } from "@/app/attendees/actions";
+import type { AttendanceResult } from "@/app/events/[slug]/attendees/actions";
 import { TopBar } from "@/components/agenda/TopBar";
 import { AttendanceForm } from "@/components/agenda/AttendanceForm";
 
@@ -78,7 +79,7 @@ export function AgendaScreen({
               setAttendanceAction={setAttendanceAction}
             />
             <div style={{ marginTop: -22, marginBottom: 34 }}>
-              <Link href="/attendees" className="txt-sm" style={{ color: "var(--teal)" }}>
+              <Link href={eventPath(event.slug, "attendees")} className="txt-sm" style={{ color: "var(--teal)" }}>
                 SEE WHO&apos;S COMING {'>'}
               </Link>
             </div>
@@ -107,7 +108,7 @@ export function AgendaScreen({
               </div>
             </div>
             {remainingOpen > 0 && (
-              <Link href="/pitch" className="btn orange">
+              <Link href={eventPath(event.slug, "pitch")} className="btn orange">
                 SUBMIT A TALK IDEA {'>'}
               </Link>
             )}
@@ -142,13 +143,13 @@ export function AgendaScreen({
                     </div>
                   )}
                   {resolved.showClaimLink && (
-                    <Link href={`/pitch?type=${row.kind}`} className="ag-open">
+                    <Link href={`${eventPath(event.slug, "pitch")}?type=${row.kind}`} className="ag-open">
                       OPEN SLOT — CLAIM IT
                     </Link>
                   )}
                   {assignment && resolved.isFilled && (
                     <Link
-                      href={`/agenda/${assignment.submissionId}/feedback`}
+                      href={eventPath(event.slug, `agenda/${assignment.submissionId}/feedback`)}
                       className="ag-open"
                     >
                       RATE THIS TALK {'>'}
@@ -164,7 +165,7 @@ export function AgendaScreen({
         <div className="row between" style={{ flexWrap: "wrap", gap: 16 }}>
           <div className="txt-sm">Times are a rough map — final running order set once talks are in.</div>
           {remainingOpen > 0 && (
-            <Link href="/pitch" className="btn orange">
+            <Link href={eventPath(event.slug, "pitch")} className="btn orange">
               + PITCH A TALK
             </Link>
           )}

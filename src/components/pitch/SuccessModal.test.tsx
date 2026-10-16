@@ -18,41 +18,41 @@ const noop = () => {};
 describe("SuccessModal", () => {
   describe("celebration recap", () => {
     it("announces the IDEA GET reward", () => {
-      render(<SuccessModal submission={submission} onClose={noop} />);
+      render(<SuccessModal eventSlug="july-2026" submission={submission} onClose={noop} />);
       expect(screen.getByText(/idea get/i)).toBeInTheDocument();
     });
 
     it("shows the slot type name for the submission", () => {
-      render(<SuccessModal submission={submission} onClose={noop} />);
+      render(<SuccessModal eventSlug="july-2026" submission={submission} onClose={noop} />);
       const name = TYPE_BY_ID[submission.type].name; // "LONG TALK"
       expect(screen.getByText(new RegExp(name, "i"))).toBeInTheDocument();
     });
 
     it("shows the slot duration for the submission", () => {
-      render(<SuccessModal submission={submission} onClose={noop} />);
+      render(<SuccessModal eventSlug="july-2026" submission={submission} onClose={noop} />);
       const dur = TYPE_BY_ID[submission.type].dur; // "30 MIN"
       expect(screen.getByText(new RegExp(dur, "i"))).toBeInTheDocument();
     });
 
     it("shows the submitted title", () => {
-      render(<SuccessModal submission={submission} onClose={noop} />);
+      render(<SuccessModal eventSlug="july-2026" submission={submission} onClose={noop} />);
       expect(
         screen.getByText(/We Deleted 40% Of Our CSS/),
       ).toBeInTheDocument();
     });
 
     it("shows the submitter's name and team", () => {
-      render(<SuccessModal submission={submission} onClose={noop} />);
+      render(<SuccessModal eventSlug="july-2026" submission={submission} onClose={noop} />);
       expect(screen.getByText(/Ada Pixel/)).toBeInTheDocument();
       expect(screen.getByText(/Web Platform/)).toBeInTheDocument();
     });
   });
 
   describe("navigation", () => {
-    it("offers a BACK TO AGENDA link pointing at /agenda", () => {
-      render(<SuccessModal submission={submission} onClose={noop} />);
+    it("offers a BACK TO AGENDA link pointing at the event agenda", () => {
+      render(<SuccessModal eventSlug="july-2026" submission={submission} onClose={noop} />);
       const link = screen.getByRole("link", { name: /back to agenda/i });
-      expect(link.getAttribute("href")).toBe("/agenda");
+      expect(link.getAttribute("href")).toBe("/events/july-2026/agenda");
     });
   });
 
@@ -61,7 +61,7 @@ describe("SuccessModal", () => {
       const user = userEvent.setup();
       const onClose = vi.fn();
       const { container } = render(
-        <SuccessModal submission={submission} onClose={onClose} />,
+        <SuccessModal eventSlug="july-2026" submission={submission} onClose={onClose} />,
       );
 
       const scrim = container.querySelector(".modal-back");
@@ -75,7 +75,7 @@ describe("SuccessModal", () => {
       const user = userEvent.setup();
       const onClose = vi.fn();
       const { container } = render(
-        <SuccessModal submission={submission} onClose={onClose} />,
+        <SuccessModal eventSlug="july-2026" submission={submission} onClose={onClose} />,
       );
 
       const card = container.querySelector(".modal-card");

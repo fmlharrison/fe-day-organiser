@@ -6,11 +6,13 @@ import type { TalkTypeId } from "@/lib/feday-data";
 import { getAgendaAssignments, validateAssignment } from "@/lib/agenda";
 import { isOrganiser } from "@/lib/submissions";
 import { getSessionUser } from "@/lib/auth/user";
-import { getAgendaItems, getCurrentEvent } from "@/lib/events.server";
+import { getAgendaItems, getEventBySlug } from "@/lib/events.server";
+import { eventPath } from "@/lib/routes";
 
 export type AssignResult = { ok: true } | { ok: false; formError: string };
 
 export async function assignSubmissionToSlot(
+  eventSlug: string,
   submissionId: string,
   slotId: string,
 ): Promise<AssignResult> {
@@ -23,9 +25,9 @@ export async function assignSubmissionToSlot(
     return { ok: false, formError: "Your session expired. Please sign in again." };
   }
 
-  const event = await getCurrentEvent();
+  const event = await getEventBySlug(eventSlug);
   if (!event) {
-    return { ok: false, formError: "There's no event to assign talks to." };
+    return { ok: false, formError: "That event doesn't exist." };
   }
 
   const supabase = await createClient();
@@ -66,44 +68,53 @@ export async function assignSubmissionToSlot(
     return { ok: false, formError: "Couldn't assign the talk. Please try again." };
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/agenda");
-  revalidatePath("/my-pitches");
-  revalidatePath("/pitch");
+  revalidatePath(eventPath(event.slug), "layout");
 
   return { ok: true };
 }
 
-export async function unassignSubmission(submissionId: string): Promise<AssignResult> {
+export async function unassignSubmission(
+  eventSlug: string,
+  submissionId: string,
+): Promise<AssignResult> {
   if (!(await isOrganiser())) {
     return { ok: false, formError: "Only organisers can remove talks from the agenda." };
+  }
+
+  const event = await getEventBySlug(eventSlug);
+  if (!event) {
+    return { ok: false, formError: "That event doesn't exist." };
   }
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("agenda_assignments")
     .delete()
-    .eq("submission_id", submissionId);
+    .eq("submission_id", submissionId)
+    .eq("event_id", event.id);
 
   if (error) {
     return { ok: false, formError: "Couldn't remove the talk. Please try again." };
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/agenda");
-  revalidatePath("/my-pitches");
-  revalidatePath("/pitch");
+  revalidatePath(eventPath(event.slug), "layout");
 
   return { ok: true };
 }
 
-export async function assignSubmissionFromForm(formData: FormData): Promise<AssignResult> {
+export async function assignSubmissionFromForm(
+  eventSlug: string,
+  formData: FormData,
+): Promise<AssignResult> {
   const submissionId = String(formData.get("submissionId") ?? "");
   const slotId = String(formData.get("slotId") ?? "");
-  return assignSubmissionToSlot(submissionId, slotId);
+  return assignSubmissionToSlot(eventSlug, submissionId, slotId);
 }
 
-export async function unassignSubmissionFromForm(formData: FormData): Promise<AssignResult> {
+export async function unassignSubmissionFromForm(
+  eventSlug: string,
+  formData: FormData,
+): Promise<AssignResult> {
   const submissionId = String(formData.get("submissionId") ?? "");
-  return unassignSubmission(submissionId);
+  return unassignSubmission(eventSlug, submissionId);
 }

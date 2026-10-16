@@ -74,13 +74,13 @@ describe("MyPitchesScreen", () => {
       expect(screen.queryByText("Tiny Wins")).toBeNull();
     });
 
-    it("offers a way to pitch a talk via a link to /pitch", () => {
+    it("offers a way to pitch a talk via a link to the event pitch page", () => {
       render(
         <MyPitchesScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} submissions={[]} />,
       );
       const pitchLinks = screen
         .getAllByRole("link")
-        .filter((link) => link.getAttribute("href") === "/pitch");
+        .filter((link) => link.getAttribute("href") === "/events/july-2026/pitch");
       expect(pitchLinks.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -97,7 +97,7 @@ describe("MyPitchesScreen", () => {
       );
       const pitchLinks = screen
         .getAllByRole("link")
-        .filter((link) => link.getAttribute("href") === "/pitch");
+        .filter((link) => link.getAttribute("href") === "/events/july-2026/pitch");
       expect(pitchLinks).toHaveLength(0);
       expect(screen.getByText(/pitching is closed/i)).toBeInTheDocument();
     });

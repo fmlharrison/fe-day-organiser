@@ -2,15 +2,17 @@ import Link from "next/link";
 import { PixelFrame } from "@/components/ui/PixelFrame";
 import { TYPE_BY_ID } from "@/lib/feday-data";
 import type { SubmittedTalk } from "@/lib/validation";
+import { eventPath } from "@/lib/routes";
 
 type SuccessModalProps = {
+  eventSlug: string;
   submission: SubmittedTalk;
   onClose: () => void;
 };
 
 const STARS = ["★", "✦", "✸", "✦", "★"];
 
-export function SuccessModal({ submission, onClose }: SuccessModalProps) {
+export function SuccessModal({ eventSlug, submission, onClose }: SuccessModalProps) {
   const t = TYPE_BY_ID[submission.type];
 
   return (
@@ -50,7 +52,7 @@ export function SuccessModal({ submission, onClose }: SuccessModalProps) {
             <div className="txt" style={{ fontSize: 19, color: "var(--ink-dim)", marginBottom: 24 }}>
               We’ll slot it into the running order and shout when it’s confirmed. Pitch another any time.
             </div>
-            <Link href="/agenda" className="btn teal">
+            <Link href={eventPath(eventSlug, "agenda")} className="btn teal">
               {'<'} BACK TO AGENDA
             </Link>
           </div>

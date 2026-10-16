@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { Btn } from "@/components/ui/Btn";
-import type { AssignResult } from "@/app/admin/actions";
+import type { AssignResult } from "@/app/events/[slug]/admin/actions";
 
 type SlotOption = {
   id: string;

@@ -49,6 +49,14 @@ export function eventBrand(event: EventRecord): string {
   return `${event.title} ${month} ’${year.slice(-2)}`;
 }
 
+export function eventDocumentTitle(event: EventRecord): string {
+  return `${event.title} ${eventEdition(event)} · Pitch a Talk`;
+}
+
+export function isEventPast(event: EventRecord, today: string): boolean {
+  return event.eventDate < today;
+}
+
 export function todayInLondon(now: Date = new Date()): string {
   // en-CA formats as YYYY-MM-DD, matching the events.event_date column.
   return new Intl.DateTimeFormat("en-CA", {

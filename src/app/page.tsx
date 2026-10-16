@@ -3,16 +3,16 @@ import { LandingScreen } from "@/components/landing/LandingScreen";
 import { signInWithGoogle } from "@/app/auth/actions";
 import { getSessionUser } from "@/lib/auth/user";
 import { requireCurrentEvent } from "@/lib/events.server";
+import { eventPath } from "@/lib/routes";
 
 export default async function Page({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const user = await getSessionUser();
-  if (user) redirect("/agenda");
+  const [user, event] = await Promise.all([getSessionUser(), requireCurrentEvent()]);
+  if (user) redirect(eventPath(event.slug, "agenda"));
 
-  const event = await requireCurrentEvent();
   const params = await searchParams;
   const error = typeof params.error === "string" ? params.error : null;
 

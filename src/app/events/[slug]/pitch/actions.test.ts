@@ -5,7 +5,7 @@ const mocks = vi.hoisted(() => ({
   from: vi.fn(),
   getAgendaAssignments: vi.fn(),
   getAgendaItems: vi.fn(),
-  getCurrentEvent: vi.fn(),
+  getEventBySlug: vi.fn(),
   getSessionUser: vi.fn(),
   insert: vi.fn(),
   revalidatePath: vi.fn(),
@@ -16,14 +16,14 @@ vi.mock("@/lib/supabase/server", () => ({ createClient: mocks.createClient }));
 vi.mock("@/lib/auth/user", () => ({ getSessionUser: mocks.getSessionUser }));
 vi.mock("@/lib/events.server", () => ({
   getAgendaItems: mocks.getAgendaItems,
-  getCurrentEvent: mocks.getCurrentEvent,
+  getEventBySlug: mocks.getEventBySlug,
 }));
 vi.mock("@/lib/agenda", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/agenda")>()),
   getAgendaAssignments: mocks.getAgendaAssignments,
 }));
 
-import { submitTalk } from "@/app/pitch/actions";
+import { submitTalk } from "@/app/events/[slug]/pitch/actions";
 import { julyAgenda, julyEvent } from "@/test/fixtures";
 
 const input = {
@@ -38,7 +38,7 @@ describe("submitTalk", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.getSessionUser.mockResolvedValue({ id: "u1", email: "ada@meetcleo.com", name: "Ada Pixel" });
-    mocks.getCurrentEvent.mockResolvedValue(julyEvent);
+    mocks.getEventBySlug.mockResolvedValue(julyEvent);
     mocks.getAgendaItems.mockResolvedValue(julyAgenda);
     mocks.getAgendaAssignments.mockResolvedValue({});
     mocks.insert.mockResolvedValue({ error: null });
@@ -46,20 +46,22 @@ describe("submitTalk", () => {
     mocks.createClient.mockResolvedValue({ from: mocks.from });
   });
 
-  it("saves the pitch against the current event", async () => {
-    const result = await submitTalk(input);
+  it("saves the pitch against the event", async () => {
+    const result = await submitTalk("july-2026", input);
 
     expect(result.ok).toBe(true);
     expect(mocks.getAgendaAssignments).toHaveBeenCalledWith(julyEvent.id);
     expect(mocks.insert).toHaveBeenCalledWith(
       expect.objectContaining({ event_id: julyEvent.id, user_id: "u1", title: input.title }),
     );
+    expect(mocks.getEventBySlug).toHaveBeenCalledWith("july-2026");
+    expect(mocks.revalidatePath).toHaveBeenCalledWith("/events/july-2026", "layout");
   });
 
-  it("rejects the pitch when there is no current event", async () => {
-    mocks.getCurrentEvent.mockResolvedValue(null);
+  it("rejects the pitch when the event doesn't exist", async () => {
+    mocks.getEventBySlug.mockResolvedValue(null);
 
-    const result = await submitTalk(input);
+    const result = await submitTalk("july-2026", input);
 
     expect(result).toMatchObject({ ok: false, errors: {} });
     expect(result).toHaveProperty("formError");
