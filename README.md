@@ -14,13 +14,16 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
 
 | Route | Access | What |
 |---|---|---|
-| `/` | public | Landing + "Sign in with Google" |
-| `/agenda` | signed-in | The FE Day running order |
-| `/agenda/[submissionId]/feedback` | signed-in | Rate an assigned talk and update your own feedback |
-| `/pitch` | signed-in | Pitch a talk (open agenda slots deep-link here via `?type=`) |
-| `/my-pitches` | signed-in | Your own submissions |
-| `/attendees` | signed-in | RSVP + who's coming to FE Day |
-| `/admin` | organisers only | All submissions, assign talks to agenda slots |
+| `/` | public | Landing for the current event + "Sign in with Google" |
+| `/events` | signed-in | Every event, upcoming and past |
+| `/events/[slug]/agenda` | signed-in | That event's running order |
+| `/events/[slug]/agenda/[submissionId]/feedback` | signed-in | Rate an assigned talk and update your own feedback |
+| `/events/[slug]/pitch` | signed-in | Pitch a talk (open agenda slots deep-link here via `?type=`) |
+| `/events/[slug]/my-pitches` | signed-in | Your own submissions for that event |
+| `/events/[slug]/attendees` | signed-in | RSVP + who's coming |
+| `/events/[slug]/admin` | organisers only | All submissions, assign talks to agenda slots |
+
+The pre-multi-event URLs (`/agenda`, `/pitch`, `/my-pitches`, `/attendees`, `/admin`) redirect to the same page on the current event: the next upcoming one, or the most recent if none are upcoming.
 
 ## Prerequisites
 

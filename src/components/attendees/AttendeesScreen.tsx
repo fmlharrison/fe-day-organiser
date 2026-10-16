@@ -1,7 +1,7 @@
 import { TopBar } from "@/components/agenda/TopBar";
 import { AttendanceForm } from "@/components/agenda/AttendanceForm";
 import { AttendeeList } from "@/components/attendees/AttendeeList";
-import type { AttendanceResult } from "@/app/attendees/actions";
+import type { AttendanceResult } from "@/app/events/[slug]/attendees/actions";
 import type { SessionUser } from "@/lib/auth/user";
 import type { EventRecord } from "@/lib/events";
 import type {

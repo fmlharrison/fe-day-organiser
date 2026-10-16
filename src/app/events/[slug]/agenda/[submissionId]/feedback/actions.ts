@@ -3,7 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { getAssignmentsBySubmissionId } from "@/lib/agenda";
 import { getSessionUser } from "@/lib/auth/user";
-import { getCurrentEvent } from "@/lib/events.server";
+import { getEventBySlug } from "@/lib/events.server";
+import { eventPath } from "@/lib/routes";
 import {
   isFeedbackValid,
   normalizeFeedbackComments,
@@ -25,6 +26,7 @@ type SavedFeedbackRow = {
 };
 
 export async function saveFeedback(
+  eventSlug: string,
   submissionId: string,
   input: FeedbackInput,
 ): Promise<FeedbackResult> {
@@ -42,7 +44,7 @@ export async function saveFeedback(
     };
   }
 
-  const event = await getCurrentEvent();
+  const event = await getEventBySlug(eventSlug);
   const assignments = event ? await getAssignmentsBySubmissionId(event.id) : {};
   if (!Object.prototype.hasOwnProperty.call(assignments, submissionId)) {
     return {
@@ -82,7 +84,7 @@ export async function saveFeedback(
   }
 
   const row = data as SavedFeedbackRow;
-  revalidatePath(`/agenda/${submissionId}/feedback`);
+  revalidatePath(eventPath(eventSlug, `agenda/${submissionId}/feedback`));
 
   return {
     ok: true,

@@ -6,7 +6,7 @@ const mocks = vi.hoisted(() => ({
   from: vi.fn(),
   getAgendaAssignments: vi.fn(),
   getAgendaItems: vi.fn(),
-  getCurrentEvent: vi.fn(),
+  getEventBySlug: vi.fn(),
   getSessionUser: vi.fn(),
   insert: vi.fn(),
   isOrganiser: vi.fn(),
@@ -20,14 +20,14 @@ vi.mock("@/lib/auth/user", () => ({ getSessionUser: mocks.getSessionUser }));
 vi.mock("@/lib/submissions", () => ({ isOrganiser: mocks.isOrganiser }));
 vi.mock("@/lib/events.server", () => ({
   getAgendaItems: mocks.getAgendaItems,
-  getCurrentEvent: mocks.getCurrentEvent,
+  getEventBySlug: mocks.getEventBySlug,
 }));
 vi.mock("@/lib/agenda", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/lib/agenda")>()),
   getAgendaAssignments: mocks.getAgendaAssignments,
 }));
 
-import { assignSubmissionToSlot } from "@/app/admin/actions";
+import { assignSubmissionToSlot } from "@/app/events/[slug]/admin/actions";
 import { julyAgenda, julyEvent } from "@/test/fixtures";
 
 describe("assignSubmissionToSlot", () => {
@@ -35,7 +35,7 @@ describe("assignSubmissionToSlot", () => {
     vi.clearAllMocks();
     mocks.isOrganiser.mockResolvedValue(true);
     mocks.getSessionUser.mockResolvedValue({ id: "u1", email: "ada@meetcleo.com", name: "Ada Pixel" });
-    mocks.getCurrentEvent.mockResolvedValue(julyEvent);
+    mocks.getEventBySlug.mockResolvedValue(julyEvent);
     mocks.getAgendaItems.mockResolvedValue(julyAgenda);
     mocks.getAgendaAssignments.mockResolvedValue({});
     mocks.maybeSingle.mockResolvedValue({ data: { id: "sub-1", type: "talk" }, error: null });
@@ -48,8 +48,8 @@ describe("assignSubmissionToSlot", () => {
     mocks.createClient.mockResolvedValue({ from: mocks.from });
   });
 
-  it("looks the submission up within the current event and records the event on the assignment", async () => {
-    const result = await assignSubmissionToSlot("sub-1", "talk-1");
+  it("looks the submission up within the event and records the event on the assignment", async () => {
+    const result = await assignSubmissionToSlot("july-2026", "sub-1", "talk-1");
 
     expect(result).toEqual({ ok: true });
     expect(mocks.eq).toHaveBeenCalledWith("event_id", julyEvent.id);
@@ -62,10 +62,10 @@ describe("assignSubmissionToSlot", () => {
     });
   });
 
-  it("rejects a submission that isn't part of the current event", async () => {
+  it("rejects a submission that isn't part of the event", async () => {
     mocks.maybeSingle.mockResolvedValue({ data: null, error: null });
 
-    const result = await assignSubmissionToSlot("sub-from-another-event", "talk-1");
+    const result = await assignSubmissionToSlot("july-2026", "sub-from-another-event", "talk-1");
 
     expect(result).toEqual({ ok: false, formError: "Couldn't find that submission." });
     expect(mocks.insert).not.toHaveBeenCalled();

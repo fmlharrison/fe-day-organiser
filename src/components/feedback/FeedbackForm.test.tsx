@@ -41,6 +41,7 @@ function renderForm(
 ) {
   return render(
     <FeedbackForm
+      eventSlug="july-2026"
       assignment={assignment}
       slotLabel="Talk Slot #1"
       existingFeedback={initialFeedback}

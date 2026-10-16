@@ -1,9 +1,11 @@
 import { describe, it, expect } from "vitest";
 import {
   eventBrand,
+  eventDocumentTitle,
   eventEdition,
   formatEventDateShort,
   formatEventTimeRange,
+  isEventPast,
   todayInLondon,
 } from "@/lib/events";
 import { julyEvent } from "@/test/fixtures";
@@ -34,6 +36,20 @@ describe("eventBrand", () => {
   it("combines the title with the month and short year", () => {
     expect(eventBrand(julyEvent)).toBe("FE DAY JUL ’26");
     expect(eventBrand(decemberEvent)).toBe("FE DAY DEC ’26");
+  });
+});
+
+describe("eventDocumentTitle", () => {
+  it("names the event by month and year", () => {
+    expect(eventDocumentTitle(decemberEvent)).toBe("FE DAY DEC 2026 · Pitch a Talk");
+  });
+});
+
+describe("isEventPast", () => {
+  it("treats an event as current through its own day", () => {
+    expect(isEventPast(julyEvent, "2026-06-30")).toBe(false);
+    expect(isEventPast(julyEvent, "2026-07-01")).toBe(false);
+    expect(isEventPast(julyEvent, "2026-07-02")).toBe(true);
   });
 });
 

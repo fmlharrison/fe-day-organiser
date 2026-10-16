@@ -3,10 +3,11 @@ import { TYPE_BY_ID, formatSlotLabel } from "@/lib/feday-data";
 import { getOpenSlots, type AssignedTalk } from "@/lib/agenda";
 import type { AgendaItem } from "@/lib/events";
 import type { TalkSubmissionRow } from "@/lib/submissions";
-import { assignSubmissionFromForm, unassignSubmissionFromForm } from "@/app/admin/actions";
+import { assignSubmissionFromForm, unassignSubmissionFromForm } from "@/app/events/[slug]/admin/actions";
 import { AdminAssignForm } from "@/components/submissions/AdminAssignForm";
 
 type AdminSubmissionListProps = {
+  eventSlug: string;
   submissions: TalkSubmissionRow[];
   items: AgendaItem[];
   assignmentsBySlot: Record<string, AssignedTalk>;
@@ -22,12 +23,15 @@ function formatDate(iso: string): string {
 }
 
 export function AdminSubmissionList({
+  eventSlug,
   submissions,
   items,
   assignmentsBySlot,
   assignmentsBySubmission,
 }: AdminSubmissionListProps) {
   const openSlots = getOpenSlots(items);
+  const assignAction = assignSubmissionFromForm.bind(null, eventSlug);
+  const unassignAction = unassignSubmissionFromForm.bind(null, eventSlug);
 
   return (
     <div>
@@ -59,7 +63,7 @@ export function AdminSubmissionList({
                   SCHEDULED · {formatSlotLabel(assignedSlot)}
                 </div>
                 <AdminAssignForm
-                  action={unassignSubmissionFromForm}
+                  action={unassignAction}
                   submissionId={row.id}
                   submitLabel="REMOVE FROM AGENDA"
                   variant="ghost sm"
@@ -67,7 +71,7 @@ export function AdminSubmissionList({
               </div>
             ) : (
               <AdminAssignForm
-                action={assignSubmissionFromForm}
+                action={assignAction}
                 submissionId={row.id}
                 submitLabel="CONFIRM & ASSIGN"
                 variant="orange sm"

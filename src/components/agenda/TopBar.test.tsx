@@ -13,25 +13,30 @@ describe("TopBar", () => {
       render(<TopBar event={julyEvent} user={user} signOutAction={noop} />);
       expect(screen.getByText("FE DAY JUL ’26")).toBeInTheDocument();
     });
+
+    it("links the brand to the events list", () => {
+      render(<TopBar event={julyEvent} user={user} signOutAction={noop} />);
+      expect(screen.getByRole("link", { name: "FE DAY JUL ’26" })).toHaveAttribute("href", "/events");
+    });
   });
 
   describe("primary navigation", () => {
-    it("links to /agenda from an agenda control", () => {
+    it("links to the event agenda from an agenda control", () => {
       render(<TopBar event={julyEvent} user={user} signOutAction={noop} />);
       const link = screen.getByRole("link", { name: /^agenda$/i });
-      expect(link.getAttribute("href")).toBe("/agenda");
+      expect(link.getAttribute("href")).toBe("/events/july-2026/agenda");
     });
 
-    it("links to /attendees from a who's in control", () => {
+    it("links to the event attendees from a who's in control", () => {
       render(<TopBar event={julyEvent} user={user} signOutAction={noop} />);
       const link = screen.getByRole("link", { name: /who's in/i });
-      expect(link.getAttribute("href")).toBe("/attendees");
+      expect(link.getAttribute("href")).toBe("/events/july-2026/attendees");
     });
 
-    it("links to /my-pitches from a my pitches control", () => {
+    it("links to the event pitches from a my pitches control", () => {
       render(<TopBar event={julyEvent} user={user} signOutAction={noop} />);
       const link = screen.getByRole("link", { name: /my pitches/i });
-      expect(link.getAttribute("href")).toBe("/my-pitches");
+      expect(link.getAttribute("href")).toBe("/events/july-2026/my-pitches");
     });
 
     it("orders nav links as agenda, who's in, then my pitches", () => {
@@ -65,10 +70,10 @@ describe("TopBar", () => {
       expect(screen.queryByRole("link", { name: /admin/i })).toBeNull();
     });
 
-    it("shows an admin link to /admin when the user is an organiser", () => {
+    it("shows an admin link to the event admin when the user is an organiser", () => {
       render(<TopBar event={julyEvent} user={user} isOrganiser signOutAction={noop} />);
       const link = screen.getByRole("link", { name: /admin/i });
-      expect(link.getAttribute("href")).toBe("/admin");
+      expect(link.getAttribute("href")).toBe("/events/july-2026/admin");
     });
   });
 });

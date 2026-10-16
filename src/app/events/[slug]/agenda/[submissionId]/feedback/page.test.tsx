@@ -10,14 +10,14 @@ const mocks = vi.hoisted(() => ({
   notFound: vi.fn(() => {
     throw new Error("NEXT_NOT_FOUND");
   }),
-  requireCurrentEvent: vi.fn(),
+  requireEvent: vi.fn(),
   requireUser: vi.fn(),
   topBar: vi.fn(() => null),
 }));
 
 vi.mock("next/navigation", () => ({ notFound: mocks.notFound }));
 vi.mock("@/app/auth/actions", () => ({ signOut: vi.fn() }));
-vi.mock("@/app/agenda/[submissionId]/feedback/actions", () => ({
+vi.mock("@/app/events/[slug]/agenda/[submissionId]/feedback/actions", () => ({
   saveFeedback: vi.fn(),
 }));
 vi.mock("@/components/agenda/TopBar", () => ({ TopBar: mocks.topBar }));
@@ -30,14 +30,14 @@ vi.mock("@/lib/agenda", () => ({
 vi.mock("@/lib/auth/user", () => ({ requireUser: mocks.requireUser }));
 vi.mock("@/lib/events.server", () => ({
   getAgendaItems: mocks.getAgendaItems,
-  requireCurrentEvent: mocks.requireCurrentEvent,
+  requireEvent: mocks.requireEvent,
 }));
 vi.mock("@/lib/feedback.server", () => ({
   getFeedbackForReviewer: mocks.getFeedbackForReviewer,
 }));
 vi.mock("@/lib/submissions", () => ({ isOrganiser: mocks.isOrganiser }));
 
-import FeedbackPage from "@/app/agenda/[submissionId]/feedback/page";
+import FeedbackPage from "@/app/events/[slug]/agenda/[submissionId]/feedback/page";
 import { julyAgenda, julyEvent } from "@/test/fixtures";
 
 const submissionId = "11111111-1111-4111-8111-111111111111";
@@ -60,7 +60,7 @@ describe("FeedbackPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mocks.requireUser.mockResolvedValue(reviewer);
-    mocks.requireCurrentEvent.mockResolvedValue(julyEvent);
+    mocks.requireEvent.mockResolvedValue(julyEvent);
     mocks.getAgendaItems.mockResolvedValue(julyAgenda);
     mocks.getAssignmentsBySubmissionId.mockResolvedValue({
       [submissionId]: assignment,
@@ -70,9 +70,10 @@ describe("FeedbackPage", () => {
   });
 
   it("requires a user and loads feedback for the session reviewer", async () => {
-    render(await FeedbackPage({ params: Promise.resolve({ submissionId }) }));
+    render(await FeedbackPage({ params: Promise.resolve({ slug: "july-2026", submissionId }) }));
 
     expect(mocks.requireUser).toHaveBeenCalledTimes(1);
+    expect(mocks.requireEvent).toHaveBeenCalledWith("july-2026");
     expect(mocks.getAssignmentsBySubmissionId).toHaveBeenCalledWith(julyEvent.id);
     expect(mocks.getFeedbackForReviewer).toHaveBeenCalledWith(
       submissionId,
@@ -90,7 +91,7 @@ describe("FeedbackPage", () => {
     );
 
     await expect(
-      FeedbackPage({ params: Promise.resolve({ submissionId }) }),
+      FeedbackPage({ params: Promise.resolve({ slug: "july-2026", submissionId }) }),
     ).rejects.toThrow("NEXT_NOT_FOUND");
 
     expect(mocks.notFound).toHaveBeenCalledTimes(1);

@@ -5,6 +5,7 @@ import { formatSlotLabel } from "@/lib/feday-data";
 import type { AssignedTalk } from "@/lib/agenda";
 import type { SessionUser } from "@/lib/auth/user";
 import type { AgendaItem, EventRecord } from "@/lib/events";
+import { eventPath } from "@/lib/routes";
 import type { TalkSubmissionRow } from "@/lib/submissions";
 
 type MyPitchesScreenProps = {
@@ -65,7 +66,7 @@ export function MyPitchesScreen({
         ) : (
           <div className="row" style={{ gap: 18, flexWrap: "wrap" }}>
             <div className="txt">No pitches in the queue yet.</div>
-            <Link href="/pitch" className="btn orange">
+            <Link href={eventPath(event.slug, "pitch")} className="btn orange">
               PITCH AN IDEA {'>'}
             </Link>
           </div>

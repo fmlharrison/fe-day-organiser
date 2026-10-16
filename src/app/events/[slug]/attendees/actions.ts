@@ -3,12 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/user";
-import { getCurrentEvent } from "@/lib/events.server";
+import { getEventBySlug } from "@/lib/events.server";
+import { eventPath } from "@/lib/routes";
 import { isAttendanceMode, type AttendanceMode } from "@/lib/attendance";
 
 export type AttendanceResult = { ok: true; mode: AttendanceMode } | { ok: false; formError: string };
 
-export async function setAttendance(mode: string): Promise<AttendanceResult> {
+export async function setAttendance(eventSlug: string, mode: string): Promise<AttendanceResult> {
   if (!isAttendanceMode(mode)) {
     return { ok: false, formError: "Pick how you're joining — in person or remote." };
   }
@@ -18,9 +19,9 @@ export async function setAttendance(mode: string): Promise<AttendanceResult> {
     return { ok: false, formError: "Your session expired. Please sign in again." };
   }
 
-  const event = await getCurrentEvent();
+  const event = await getEventBySlug(eventSlug);
   if (!event) {
-    return { ok: false, formError: "There's no event to RSVP to right now." };
+    return { ok: false, formError: "That event doesn't exist." };
   }
 
   const supabase = await createClient();
@@ -40,8 +41,7 @@ export async function setAttendance(mode: string): Promise<AttendanceResult> {
     return { ok: false, formError: "Couldn't save your RSVP. Please try again." };
   }
 
-  revalidatePath("/agenda");
-  revalidatePath("/attendees");
+  revalidatePath(eventPath(event.slug), "layout");
 
   return { ok: true, mode };
 }

@@ -50,6 +50,7 @@ export function AdminScreen({
 
         {submissions.length > 0 ? (
           <AdminSubmissionList
+            eventSlug={event.slug}
             submissions={submissions}
             items={items}
             assignmentsBySlot={assignmentsBySlot}

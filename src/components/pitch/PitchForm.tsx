@@ -16,15 +16,24 @@ import {
 } from "@/lib/validation";
 import { TypeCards } from "@/components/pitch/TypeCards";
 import { SuccessModal } from "@/components/pitch/SuccessModal";
+import { eventPath } from "@/lib/routes";
 
 type PitchFormProps = {
+  eventSlug: string;
   userName: string;
   presetType?: string;
   pitchingClosed?: boolean;
   submitAction: (input: TalkSubmissionInput) => Promise<SubmitResult>;
 };
 
-export function PitchForm({ userName, presetType, pitchingClosed = false, submitAction }: PitchFormProps) {
+export function PitchForm({
+  eventSlug,
+  userName,
+  presetType,
+  pitchingClosed = false,
+  submitAction,
+}: PitchFormProps) {
+  const agendaHref = eventPath(eventSlug, "agenda");
   const [form, setForm] = useState<TalkSubmissionInput>({
     type:
       presetType && (TALK_TYPE_IDS as string[]).includes(presetType)
@@ -68,7 +77,7 @@ export function PitchForm({ userName, presetType, pitchingClosed = false, submit
       <div>
         <div style={{ marginBottom: 26 }}>
           <Link
-            href="/agenda"
+            href={agendaHref}
             className="pixel"
             style={{ display: "inline-block", color: "var(--teal)", fontSize: 11, marginBottom: 16 }}
           >
@@ -81,7 +90,7 @@ export function PitchForm({ userName, presetType, pitchingClosed = false, submit
             Every talk and lightning slot is filled. See you on the day!
           </div>
         </div>
-        <Link href="/agenda" className="btn orange">
+        <Link href={agendaHref} className="btn orange">
           BACK TO AGENDA {'>'}
         </Link>
       </div>
@@ -92,7 +101,7 @@ export function PitchForm({ userName, presetType, pitchingClosed = false, submit
     <div>
       <div style={{ marginBottom: 26 }}>
         <Link
-          href="/agenda"
+          href={agendaHref}
           className="pixel"
           style={{ display: "inline-block", color: "var(--teal)", fontSize: 11, marginBottom: 16 }}
         >
@@ -189,7 +198,7 @@ export function PitchForm({ userName, presetType, pitchingClosed = false, submit
         </div>
 
         <div className="row between" style={{ gap: 16, marginTop: 30, flexWrap: "wrap" }}>
-          <Link href="/agenda" className="btn ghost">
+          <Link href={agendaHref} className="btn ghost">
             CANCEL
           </Link>
           {formError && (
@@ -203,7 +212,7 @@ export function PitchForm({ userName, presetType, pitchingClosed = false, submit
         </div>
       </form>
 
-      {success && <SuccessModal submission={success} onClose={() => setSuccess(null)} />}
+      {success && <SuccessModal eventSlug={eventSlug} submission={success} onClose={() => setSuccess(null)} />}
     </div>
   );
 }

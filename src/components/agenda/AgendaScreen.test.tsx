@@ -110,7 +110,7 @@ describe("AgendaScreen", () => {
         />,
       );
       const link = screen.getByRole("link", { name: /SEE WHO'S COMING/i });
-      expect(link).toHaveAttribute("href", "/attendees");
+      expect(link).toHaveAttribute("href", "/events/july-2026/attendees");
     });
   });
 
@@ -120,11 +120,11 @@ describe("AgendaScreen", () => {
       expect(screen.getByText(/OPEN SLOTS NEED YOU/i)).toBeInTheDocument();
     });
 
-    it("offers a 'submit a talk idea' link to /pitch", () => {
+    it("offers a 'submit a talk idea' link to the event pitch page", () => {
       render(<AgendaScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} />);
       const links = screen
         .getAllByRole("link", { name: /submit a talk idea/i })
-        .filter((link) => link.getAttribute("href") === "/pitch");
+        .filter((link) => link.getAttribute("href") === "/events/july-2026/pitch");
       expect(links.length).toBeGreaterThanOrEqual(1);
     });
 
@@ -176,13 +176,13 @@ describe("AgendaScreen", () => {
       ).toBeGreaterThanOrEqual(1);
     });
 
-    it("links an open lightning slot to /pitch?type=lightning", () => {
+    it("links an open lightning slot to the pitch page with type=lightning", () => {
       render(<AgendaScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} />);
       const claimLinks = screen.getAllByRole("link", {
         name: /OPEN SLOT — CLAIM IT/i,
       });
       const lightningClaim = claimLinks.some(
-        (link) => link.getAttribute("href") === "/pitch?type=lightning",
+        (link) => link.getAttribute("href") === "/events/july-2026/pitch?type=lightning",
       );
       expect(lightningClaim).toBe(true);
     });
@@ -220,7 +220,7 @@ describe("AgendaScreen", () => {
       expect(screen.queryByText("Talk Slot #1")).toBeNull();
       expect(
         screen.getByRole("link", { name: /^RATE THIS TALK\b/i }),
-      ).toHaveAttribute("href", "/agenda/sub-1/feedback");
+      ).toHaveAttribute("href", "/events/july-2026/agenda/sub-1/feedback");
     });
 
     it("does not show a feedback link on an unassigned open slot", () => {

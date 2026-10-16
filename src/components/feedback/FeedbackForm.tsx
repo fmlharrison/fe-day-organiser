@@ -15,8 +15,10 @@ import {
 } from "@/lib/feedback";
 import { Btn } from "@/components/ui/Btn";
 import { PixelFrame } from "@/components/ui/PixelFrame";
+import { eventPath } from "@/lib/routes";
 
 type FeedbackFormProps = {
+  eventSlug: string;
   assignment: AssignedTalk;
   slotLabel: string;
   existingFeedback: TalkFeedback | null;
@@ -26,6 +28,7 @@ type FeedbackFormProps = {
 const RATINGS: FeedbackRating[] = [1, 2, 3, 4, 5];
 
 export function FeedbackForm({
+  eventSlug,
   assignment,
   slotLabel,
   existingFeedback,
@@ -78,7 +81,7 @@ export function FeedbackForm({
   return (
     <div>
       <Link
-        href="/agenda"
+        href={eventPath(eventSlug, "agenda")}
         className="pixel"
         style={{
           display: "inline-block",
@@ -239,7 +242,7 @@ export function FeedbackForm({
             )}
 
             <div className="row between" style={{ gap: 16, flexWrap: "wrap" }}>
-              <Link href="/agenda" className="btn ghost">
+              <Link href={eventPath(eventSlug, "agenda")} className="btn ghost">
                 BACK
               </Link>
               <Btn variant="teal lg" type="submit" disabled={submitting}>

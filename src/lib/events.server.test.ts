@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   createClient: vi.fn(),
+  eq: vi.fn(),
   from: vi.fn(),
   gte: vi.fn(),
   lt: vi.fn(),
@@ -12,7 +13,7 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: mocks.createClient,
 }));
 
-import { getCurrentEvent } from "@/lib/events.server";
+import { getCurrentEvent, getEventBySlug } from "@/lib/events.server";
 
 const julyRow = {
   id: "event-july-2026",
@@ -75,5 +76,30 @@ describe("getCurrentEvent", () => {
     mocks.maybeSingle.mockResolvedValueOnce({ data: null, error: new Error("boom") });
 
     await expect(getCurrentEvent()).rejects.toThrow("boom");
+  });
+});
+
+describe("getEventBySlug", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    const query = { select: () => query, eq: mocks.eq, maybeSingle: mocks.maybeSingle };
+    mocks.eq.mockReturnValue(query);
+    mocks.from.mockReturnValue(query);
+    mocks.createClient.mockResolvedValue({ from: mocks.from });
+  });
+
+  it("looks the event up by slug", async () => {
+    mocks.maybeSingle.mockResolvedValueOnce({ data: julyRow, error: null });
+
+    const event = await getEventBySlug("july-2026");
+
+    expect(mocks.eq).toHaveBeenCalledWith("slug", "july-2026");
+    expect(event).toMatchObject({ id: "event-july-2026", startTime: "10:00" });
+  });
+
+  it("returns null for an unknown slug", async () => {
+    mocks.maybeSingle.mockResolvedValueOnce({ data: null, error: null });
+
+    expect(await getEventBySlug("nope")).toBeNull();
   });
 });

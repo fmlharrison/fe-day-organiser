@@ -81,6 +81,33 @@ export const getCurrentEvent = cache(async (): Promise<EventRecord | null> => {
   return latest.data ? mapEventRow(latest.data as EventRow) : null;
 });
 
+export const getEventBySlug = cache(async (slug: string): Promise<EventRecord | null> => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("events")
+    .select(EVENT_COLUMNS)
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapEventRow(data as EventRow) : null;
+});
+
+export async function requireEvent(slug: string): Promise<EventRecord> {
+  const event = await getEventBySlug(slug);
+  if (!event) notFound();
+  return event;
+}
+
+export async function listEvents(): Promise<EventRecord[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("events")
+    .select(EVENT_COLUMNS)
+    .order("event_date", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map((row) => mapEventRow(row as EventRow));
+}
+
 export async function requireCurrentEvent(): Promise<EventRecord> {
   const event = await getCurrentEvent();
   if (!event) notFound();

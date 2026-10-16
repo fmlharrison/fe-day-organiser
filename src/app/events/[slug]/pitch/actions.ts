@@ -11,9 +11,13 @@ import {
 } from "@/lib/validation";
 import type { TalkTypeId } from "@/lib/feday-data";
 import { getAgendaAssignments, isPitchingClosed } from "@/lib/agenda";
-import { getAgendaItems, getCurrentEvent } from "@/lib/events.server";
+import { getAgendaItems, getEventBySlug } from "@/lib/events.server";
+import { eventPath } from "@/lib/routes";
 
-export async function submitTalk(input: TalkSubmissionInput): Promise<SubmitResult> {
+export async function submitTalk(
+  eventSlug: string,
+  input: TalkSubmissionInput,
+): Promise<SubmitResult> {
   const errors = validateSubmission(input);
   if (!isValid(errors)) {
     return { ok: false, errors };
@@ -24,9 +28,9 @@ export async function submitTalk(input: TalkSubmissionInput): Promise<SubmitResu
     return { ok: false, errors: {}, formError: "Your session expired. Please sign in again." };
   }
 
-  const event = await getCurrentEvent();
+  const event = await getEventBySlug(eventSlug);
   if (!event) {
-    return { ok: false, errors: {}, formError: "There's no event to pitch for right now." };
+    return { ok: false, errors: {}, formError: "That event doesn't exist." };
   }
 
   const [items, assignments] = await Promise.all([
@@ -58,7 +62,7 @@ export async function submitTalk(input: TalkSubmissionInput): Promise<SubmitResu
     return { ok: false, errors: {}, formError: "Couldn't save your pitch. Please try again." };
   }
 
-  revalidatePath("/my-pitches");
+  revalidatePath(eventPath(event.slug), "layout");
 
   return {
     ok: true,
