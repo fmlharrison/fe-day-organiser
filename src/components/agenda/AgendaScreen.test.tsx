@@ -281,4 +281,65 @@ describe("AgendaScreen", () => {
       ).toHaveLength(openRows.length - 1);
     });
   });
+
+  describe("past event", () => {
+    it("shows the wrapped banner and hides RSVP and pitching", () => {
+      render(
+        <AgendaScreen
+          event={julyEvent}
+          items={julyAgenda}
+          isPast
+          user={user}
+          signOutAction={noop}
+          setAttendanceAction={vi.fn()}
+        />,
+      );
+
+      expect(screen.getByText("THIS EVENT HAS WRAPPED")).toBeInTheDocument();
+      expect(screen.queryByText(/PRESS START TO RSVP/i)).toBeNull();
+      expect(screen.queryByRole("link", { name: /submit a talk idea/i })).toBeNull();
+      expect(screen.queryByRole("link", { name: /\+ PITCH A TALK/i })).toBeNull();
+      expect(screen.queryByRole("link", { name: /OPEN SLOT — CLAIM IT/i })).toBeNull();
+    });
+
+    it("still links filled talks to their feedback page", () => {
+      render(
+        <AgendaScreen
+          event={julyEvent}
+          items={julyAgenda}
+          isPast
+          user={user}
+          signOutAction={noop}
+          assignmentsBySlot={allSlotsFilled()}
+        />,
+      );
+
+      expect(screen.getAllByRole("link", { name: /^RATE THIS TALK\b/i })).toHaveLength(openRows.length);
+    });
+  });
+
+  describe("no agenda yet", () => {
+    it("shows the coming-soon panel with a pitch CTA and the RSVP form", () => {
+      const { container } = render(
+        <AgendaScreen
+          event={julyEvent}
+          items={[]}
+          user={user}
+          signOutAction={noop}
+          setAttendanceAction={vi.fn()}
+          attendanceCounts={{ inPerson: 0, remote: 0, total: 0 }}
+        />,
+      );
+
+      expect(screen.getByText("AGENDA COMING SOON")).toBeInTheDocument();
+      expect(screen.getByText(/PRESS START TO RSVP/i)).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: /SEE WHO'S COMING/i })).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: /submit a talk idea/i })).toHaveAttribute(
+        "href",
+        "/events/july-2026/pitch",
+      );
+      expect(container.querySelectorAll(".ag-row")).toHaveLength(0);
+      expect(container.querySelectorAll(".chip")).toHaveLength(0);
+    });
+  });
 });

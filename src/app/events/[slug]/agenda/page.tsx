@@ -6,6 +6,7 @@ import { getAttendanceCounts, getAttendanceForUser } from "@/lib/attendance.serv
 import { isOrganiser } from "@/lib/submissions";
 import { getAgendaAssignments } from "@/lib/agenda";
 import { getAgendaItems, requireEvent } from "@/lib/events.server";
+import { isEventPast, todayInLondon } from "@/lib/events";
 
 type EventPageProps = {
   params: Promise<{ slug: string }>;
@@ -25,6 +26,7 @@ export default async function AgendaPage({ params }: EventPageProps) {
     <AgendaScreen
       event={event}
       items={items}
+      isPast={isEventPast(event, todayInLondon())}
       user={user}
       isOrganiser={organiser}
       signOutAction={signOut}

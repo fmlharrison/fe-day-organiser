@@ -179,4 +179,15 @@ describe("AdminScreen", () => {
       expect(screen.getByText(/No one has RSVP'd yet/i)).toBeInTheDocument();
     });
   });
+
+  describe("no agenda slots", () => {
+    it("explains how to make pitches assignable instead of showing the assign form", () => {
+      render(
+        <AdminScreen event={julyEvent} items={[]} user={user} signOutAction={noop} submissions={rows} {...emptyAssignments} />,
+      );
+
+      expect(screen.getAllByText(/Add talk\/lightning slots to the agenda/i)).toHaveLength(2);
+      expect(screen.queryByRole("button", { name: /CONFIRM & ASSIGN/i })).toBeNull();
+    });
+  });
 });

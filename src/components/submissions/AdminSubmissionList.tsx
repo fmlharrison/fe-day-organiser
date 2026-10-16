@@ -69,6 +69,10 @@ export function AdminSubmissionList({
                   variant="ghost sm"
                 />
               </div>
+            ) : openSlots.length === 0 ? (
+              <div className="txt-sm" style={{ marginTop: 16, color: "var(--ink-dim)" }}>
+                Add talk/lightning slots to the agenda to assign pitches.
+              </div>
             ) : (
               <AdminAssignForm
                 action={assignAction}

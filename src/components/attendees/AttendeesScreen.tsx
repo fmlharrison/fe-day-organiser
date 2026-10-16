@@ -12,6 +12,7 @@ import type {
 
 type AttendeesScreenProps = {
   event: EventRecord;
+  isPast?: boolean;
   user: SessionUser;
   isOrganiser?: boolean;
   signOutAction: () => void | Promise<void>;
@@ -23,6 +24,7 @@ type AttendeesScreenProps = {
 
 export function AttendeesScreen({
   event,
+  isPast = false,
   user,
   isOrganiser,
   signOutAction,
@@ -54,11 +56,17 @@ export function AttendeesScreen({
           {counts.inPerson} in person · {counts.remote} remote · {counts.total} RSVP&apos;d
         </div>
 
-        <AttendanceForm
-          attendance={attendance}
-          counts={counts}
-          setAttendanceAction={setAttendanceAction}
-        />
+        {isPast ? (
+          <div className="txt" style={{ marginBottom: 34 }}>
+            This event has wrapped — RSVPs are closed.
+          </div>
+        ) : (
+          <AttendanceForm
+            attendance={attendance}
+            counts={counts}
+            setAttendanceAction={setAttendanceAction}
+          />
+        )}
 
         <div className="pdiv" style={{ margin: "10px 0 28px" }} />
 

@@ -23,6 +23,7 @@ type PitchFormProps = {
   userName: string;
   presetType?: string;
   pitchingClosed?: boolean;
+  isPast?: boolean;
   submitAction: (input: TalkSubmissionInput) => Promise<SubmitResult>;
 };
 
@@ -31,6 +32,7 @@ export function PitchForm({
   userName,
   presetType,
   pitchingClosed = false,
+  isPast = false,
   submitAction,
 }: PitchFormProps) {
   const agendaHref = eventPath(eventSlug, "agenda");
@@ -87,7 +89,9 @@ export function PitchForm({
             PITCHING CLOSED
           </h1>
           <div className="txt" style={{ fontSize: 20, color: "var(--ink-dim)", marginTop: 12 }}>
-            Every talk and lightning slot is filled. See you on the day!
+            {isPast
+              ? "This event has wrapped — thanks to everyone who pitched!"
+              : "Every talk and lightning slot is filled. See you on the day!"}
           </div>
         </div>
         <Link href={agendaHref} className="btn orange">

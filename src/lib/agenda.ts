@@ -120,11 +120,19 @@ export function getRemainingOpenSlotCount(
   return getOpenSlots(items).filter((slot) => !assignmentsBySlot[slot.id]).length;
 }
 
-export function isPitchingClosed(
-  items: AgendaItem[],
-  assignmentsBySlot: Record<string, AssignedTalk>,
-): boolean {
-  return getRemainingOpenSlotCount(items, assignmentsBySlot) === 0;
+export function hasAgenda(items: AgendaItem[]): boolean {
+  return items.length > 0;
+}
+
+export function isPitchingClosed(params: {
+  isPast: boolean;
+  items: AgendaItem[];
+  assignmentsBySlot: Record<string, AssignedTalk>;
+}): boolean {
+  if (params.isPast) return true;
+  // Until the agenda has talk slots, pitches are still welcome.
+  if (getOpenSlots(params.items).length === 0) return false;
+  return getRemainingOpenSlotCount(params.items, params.assignmentsBySlot) === 0;
 }
 
 export type AssignmentValidationResult = { ok: true } | { ok: false; formError: string };

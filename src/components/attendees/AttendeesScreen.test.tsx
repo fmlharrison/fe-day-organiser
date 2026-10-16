@@ -89,4 +89,23 @@ describe("AttendeesScreen", () => {
 
     expect(screen.getByText(/No one else has RSVP'd yet/i)).toBeInTheDocument();
   });
+
+  it("closes RSVPs for a past event but still lists attendees", () => {
+    render(
+      <AttendeesScreen
+        event={julyEvent}
+        isPast
+        user={user}
+        signOutAction={noop}
+        attendance={null}
+        otherAttendees={otherAttendees}
+        counts={{ inPerson: 0, remote: 1, total: 1 }}
+        setAttendanceAction={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText(/RSVPs are closed/i)).toBeInTheDocument();
+    expect(screen.queryByText(/PRESS START TO RSVP/i)).toBeNull();
+    expect(screen.getByText("Bea Byte")).toBeInTheDocument();
+  });
 });

@@ -62,7 +62,7 @@ export function MyPitchesScreen({
             )}
           </>
         ) : pitchingClosed ? (
-          <div className="txt">No pitches in the queue yet. All talk slots are filled — pitching is closed.</div>
+          <div className="txt">No pitches in the queue. Pitching is closed for this event.</div>
         ) : (
           <div className="row" style={{ gap: 18, flexWrap: "wrap" }}>
             <div className="txt">No pitches in the queue yet.</div>

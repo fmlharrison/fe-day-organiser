@@ -4,6 +4,7 @@ import { requireUser } from "@/lib/auth/user";
 import { getAgendaAssignments, getAssignmentsBySubmissionId, isPitchingClosed } from "@/lib/agenda";
 import { getMySubmissions, isOrganiser } from "@/lib/submissions";
 import { getAgendaItems, requireEvent } from "@/lib/events.server";
+import { isEventPast, todayInLondon } from "@/lib/events";
 
 type EventPageProps = {
   params: Promise<{ slug: string }>;
@@ -28,7 +29,11 @@ export default async function MyPitchesPage({ params }: EventPageProps) {
       signOutAction={signOut}
       submissions={submissions}
       assignmentsBySubmission={assignmentsBySubmission}
-      pitchingClosed={isPitchingClosed(items, assignmentsBySlot)}
+      pitchingClosed={isPitchingClosed({
+        isPast: isEventPast(event, todayInLondon()),
+        items,
+        assignmentsBySlot,
+      })}
     />
   );
 }

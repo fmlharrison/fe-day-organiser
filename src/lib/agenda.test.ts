@@ -5,6 +5,7 @@ import {
   validateAssignment,
   getRemainingOpenSlotCount,
   isPitchingClosed,
+  hasAgenda,
 } from "@/lib/agenda";
 import type { AssignedTalk } from "@/lib/agenda";
 import type { TalkTypeId } from "@/lib/feday-data";
@@ -152,18 +153,38 @@ describe("getRemainingOpenSlotCount", () => {
 });
 
 describe("isPitchingClosed", () => {
+  const allFilled = Object.fromEntries(
+    openSlots.map((slot, i) => [
+      slot.id,
+      { ...sampleAssignment, slotId: slot.id, submissionId: `sub-${i}`, type: slot.kind as TalkTypeId },
+    ]),
+  );
+
   it("returns false when open slots remain", () => {
-    expect(isPitchingClosed(items, {})).toBe(false);
-    expect(isPitchingClosed(items, { "talk-1": sampleAssignment })).toBe(false);
+    expect(isPitchingClosed({ isPast: false, items, assignmentsBySlot: {} })).toBe(false);
+    expect(
+      isPitchingClosed({ isPast: false, items, assignmentsBySlot: { "talk-1": sampleAssignment } }),
+    ).toBe(false);
   });
 
   it("returns true when every open slot is assigned", () => {
-    const filled = Object.fromEntries(
-      openSlots.map((slot, i) => [
-        slot.id,
-        { ...sampleAssignment, slotId: slot.id, submissionId: `sub-${i}`, type: slot.kind as TalkTypeId },
-      ]),
-    );
-    expect(isPitchingClosed(items, filled)).toBe(true);
+    expect(isPitchingClosed({ isPast: false, items, assignmentsBySlot: allFilled })).toBe(true);
+  });
+
+  it("returns true for a past event even with open slots", () => {
+    expect(isPitchingClosed({ isPast: true, items, assignmentsBySlot: {} })).toBe(true);
+  });
+
+  it("stays open while the agenda has no talk slots", () => {
+    expect(isPitchingClosed({ isPast: false, items: [], assignmentsBySlot: {} })).toBe(false);
+    const sessionsOnly = items.filter((item) => !openSlots.includes(item));
+    expect(isPitchingClosed({ isPast: false, items: sessionsOnly, assignmentsBySlot: {} })).toBe(false);
+  });
+});
+
+describe("hasAgenda", () => {
+  it("is false for an empty agenda", () => {
+    expect(hasAgenda([])).toBe(false);
+    expect(hasAgenda(items)).toBe(true);
   });
 });
