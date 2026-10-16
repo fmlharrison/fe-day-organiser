@@ -17,6 +17,11 @@ describe("PitchForm", () => {
       expect(screen.getByRole("heading", { name: /pitching closed/i })).toBeInTheDocument();
       expect(screen.queryByRole("button", { name: /submit idea/i })).toBeNull();
     });
+
+    it("says the event has wrapped when it's in the past", () => {
+      render(<PitchForm eventSlug="july-2026" userName="Ada Pixel" pitchingClosed isPast submitAction={vi.fn()} />);
+      expect(screen.getByText(/This event has wrapped/i)).toBeInTheDocument();
+    });
   });
 
   describe("prefill", () => {

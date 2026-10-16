@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth/user";
 import { getAgendaAssignments, isPitchingClosed } from "@/lib/agenda";
 import { isOrganiser } from "@/lib/submissions";
 import { getAgendaItems, requireEvent } from "@/lib/events.server";
+import { isEventPast, todayInLondon } from "@/lib/events";
 
 type PitchPageProps = {
   params: Promise<{ slug: string }>;
@@ -20,7 +21,8 @@ export default async function PitchPage({ params, searchParams }: PitchPageProps
     getAgendaItems(event.id),
     getAgendaAssignments(event.id),
   ]);
-  const pitchingClosed = isPitchingClosed(items, assignmentsBySlot);
+  const isPast = isEventPast(event, todayInLondon());
+  const pitchingClosed = isPitchingClosed({ isPast, items, assignmentsBySlot });
   const t = (await searchParams).type;
   const presetType = typeof t === "string" ? t : undefined;
 
@@ -33,6 +35,7 @@ export default async function PitchPage({ params, searchParams }: PitchPageProps
           userName={user.name}
           presetType={presetType}
           pitchingClosed={pitchingClosed}
+          isPast={isPast}
           submitAction={submitTalk.bind(null, event.slug)}
         />
       </div>

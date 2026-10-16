@@ -13,6 +13,7 @@ import type { TalkTypeId } from "@/lib/feday-data";
 import { getAgendaAssignments, isPitchingClosed } from "@/lib/agenda";
 import { getAgendaItems, getEventBySlug } from "@/lib/events.server";
 import { eventPath } from "@/lib/routes";
+import { isEventPast, todayInLondon } from "@/lib/events";
 
 export async function submitTalk(
   eventSlug: string,
@@ -33,11 +34,16 @@ export async function submitTalk(
     return { ok: false, errors: {}, formError: "That event doesn't exist." };
   }
 
+  const isPast = isEventPast(event, todayInLondon());
+  if (isPast) {
+    return { ok: false, errors: {}, formError: "This event has wrapped — pitching is closed." };
+  }
+
   const [items, assignments] = await Promise.all([
     getAgendaItems(event.id),
     getAgendaAssignments(event.id),
   ]);
-  if (isPitchingClosed(items, assignments)) {
+  if (isPitchingClosed({ isPast, items, assignmentsBySlot: assignments })) {
     return {
       ok: false,
       errors: {},

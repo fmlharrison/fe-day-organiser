@@ -5,7 +5,13 @@ import { Chip } from "@/components/ui/Chip";
 import { Stat } from "@/components/ui/Stat";
 import { KIND_META, PITCHABLE_TALK_TYPES } from "@/lib/feday-data";
 import type { AssignedTalk } from "@/lib/agenda";
-import { getOpenSlots, getRemainingOpenSlotCount, resolveAgendaRow } from "@/lib/agenda";
+import {
+  getOpenSlots,
+  getRemainingOpenSlotCount,
+  hasAgenda,
+  isPitchingClosed,
+  resolveAgendaRow,
+} from "@/lib/agenda";
 import {
   formatEventDateShort,
   formatEventTimeRange,
@@ -26,6 +32,7 @@ import { AttendanceForm } from "@/components/agenda/AttendanceForm";
 type AgendaScreenProps = {
   event: EventRecord;
   items: AgendaItem[];
+  isPast?: boolean;
   user: SessionUser;
   isOrganiser?: boolean;
   signOutAction: () => void | Promise<void>;
@@ -38,6 +45,7 @@ type AgendaScreenProps = {
 export function AgendaScreen({
   event,
   items,
+  isPast = false,
   user,
   isOrganiser,
   signOutAction,
@@ -49,6 +57,31 @@ export function AgendaScreen({
   const firstName = user.name.split(/\s+/)[0]?.toUpperCase();
   const openSlotCount = getOpenSlots(items).length;
   const remainingOpen = getRemainingOpenSlotCount(items, assignmentsBySlot);
+  const pitchingClosed = isPitchingClosed({ isPast, items, assignmentsBySlot });
+  const pitchHref = eventPath(event.slug, "pitch");
+
+  const status = isPast
+    ? {
+        title: "THIS EVENT HAS WRAPPED",
+        body: "Thanks for playing! Rate the talks you caught below.",
+      }
+    : !hasAgenda(items)
+      ? {
+          title: "AGENDA COMING SOON",
+          body: "The agenda isn’t set yet — but you can still pitch a talk and tell us how you’re joining.",
+        }
+      : pitchingClosed
+        ? {
+            title: "AGENDA LOCKED IN",
+            body: "Every talk and lightning slot is filled. See you on the day!",
+          }
+        : {
+            title: "OPEN SLOTS NEED YOU",
+            body:
+              openSlotCount > 0
+                ? `${remainingOpen} of ${openSlotCount} talk slots still open. Grab one — pitch the thing you’ve been dying to share.`
+                : "Pitch the thing you’ve been dying to share.",
+          };
 
   return (
     <div>
@@ -71,7 +104,7 @@ export function AgendaScreen({
           <Stat k="WHERE" v={event.location} />
         </div>
 
-        {setAttendanceAction && (
+        {setAttendanceAction && !isPast && (
           <>
             <AttendanceForm
               attendance={attendance}
@@ -86,29 +119,27 @@ export function AgendaScreen({
           </>
         )}
 
-        <div className="row" style={{ gap: 10, flexWrap: "wrap", margin: "20px 0 30px" }}>
-          {PITCHABLE_TALK_TYPES.map((t) => (
-            <Chip key={t.id} swatch={t.color}>
-              {t.name}
-            </Chip>
-          ))}
-          <Chip swatch="var(--ink-dim)">BREAK</Chip>
-        </div>
+        {hasAgenda(items) && (
+          <div className="row" style={{ gap: 10, flexWrap: "wrap", margin: "20px 0 30px" }}>
+            {PITCHABLE_TALK_TYPES.map((t) => (
+              <Chip key={t.id} swatch={t.color}>
+                {t.name}
+              </Chip>
+            ))}
+            <Chip swatch="var(--ink-dim)">BREAK</Chip>
+          </div>
+        )}
 
         <PixelFrame frame="var(--orange)" surface="var(--bg-2)" style={{ marginBottom: 34 }} pad={22}>
           <div className="row between" style={{ gap: 18, flexWrap: "wrap" }}>
             <div style={{ maxWidth: 460 }}>
-              <h3 style={{ fontSize: 14, color: "var(--orange)", marginBottom: 10 }}>
-                {remainingOpen > 0 ? "OPEN SLOTS NEED YOU" : "AGENDA LOCKED IN"}
-              </h3>
+              <h3 style={{ fontSize: 14, color: "var(--orange)", marginBottom: 10 }}>{status.title}</h3>
               <div className="txt" style={{ fontSize: 20 }}>
-                {remainingOpen > 0
-                  ? `${remainingOpen} of ${openSlotCount} talk slots still open. Grab one — pitch the thing you’ve been dying to share.`
-                  : "Every talk and lightning slot is filled. See you on the day!"}
+                {status.body}
               </div>
             </div>
-            {remainingOpen > 0 && (
-              <Link href={eventPath(event.slug, "pitch")} className="btn orange">
+            {!pitchingClosed && (
+              <Link href={pitchHref} className="btn orange">
                 SUBMIT A TALK IDEA {'>'}
               </Link>
             )}
@@ -142,8 +173,8 @@ export function AgendaScreen({
                       — {resolved.speaker}
                     </div>
                   )}
-                  {resolved.showClaimLink && (
-                    <Link href={`${eventPath(event.slug, "pitch")}?type=${row.kind}`} className="ag-open">
+                  {resolved.showClaimLink && !isPast && (
+                    <Link href={`${pitchHref}?type=${row.kind}`} className="ag-open">
                       OPEN SLOT — CLAIM IT
                     </Link>
                   )}
@@ -161,15 +192,19 @@ export function AgendaScreen({
           })}
         </div>
 
-        <div className="pdiv" style={{ margin: "40px 0 24px" }} />
-        <div className="row between" style={{ flexWrap: "wrap", gap: 16 }}>
-          <div className="txt-sm">Times are a rough map — final running order set once talks are in.</div>
-          {remainingOpen > 0 && (
-            <Link href={eventPath(event.slug, "pitch")} className="btn orange">
-              + PITCH A TALK
-            </Link>
-          )}
-        </div>
+        {hasAgenda(items) && (
+          <>
+            <div className="pdiv" style={{ margin: "40px 0 24px" }} />
+            <div className="row between" style={{ flexWrap: "wrap", gap: 16 }}>
+              <div className="txt-sm">Times are a rough map — final running order set once talks are in.</div>
+              {!pitchingClosed && (
+                <Link href={pitchHref} className="btn orange">
+                  + PITCH A TALK
+                </Link>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

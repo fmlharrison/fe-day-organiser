@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth/user";
 import { getEventBySlug } from "@/lib/events.server";
 import { eventPath } from "@/lib/routes";
+import { isEventPast, todayInLondon } from "@/lib/events";
 import { isAttendanceMode, type AttendanceMode } from "@/lib/attendance";
 
 export type AttendanceResult = { ok: true; mode: AttendanceMode } | { ok: false; formError: string };
@@ -22,6 +23,9 @@ export async function setAttendance(eventSlug: string, mode: string): Promise<At
   const event = await getEventBySlug(eventSlug);
   if (!event) {
     return { ok: false, formError: "That event doesn't exist." };
+  }
+  if (isEventPast(event, todayInLondon())) {
+    return { ok: false, formError: "This event has wrapped — RSVPs are closed." };
   }
 
   const supabase = await createClient();

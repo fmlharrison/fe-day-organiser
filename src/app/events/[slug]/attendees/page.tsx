@@ -6,6 +6,7 @@ import { partitionAttendees } from "@/lib/attendance";
 import { getAllAttendance, getAttendanceCounts } from "@/lib/attendance.server";
 import { isOrganiser } from "@/lib/submissions";
 import { requireEvent } from "@/lib/events.server";
+import { isEventPast, todayInLondon } from "@/lib/events";
 
 type EventPageProps = {
   params: Promise<{ slug: string }>;
@@ -24,6 +25,7 @@ export default async function AttendeesPage({ params }: EventPageProps) {
   return (
     <AttendeesScreen
       event={event}
+      isPast={isEventPast(event, todayInLondon())}
       user={user}
       isOrganiser={organiser}
       signOutAction={signOut}
