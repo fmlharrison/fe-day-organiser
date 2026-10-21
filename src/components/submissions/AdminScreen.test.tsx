@@ -190,4 +190,15 @@ describe("AdminScreen", () => {
       expect(screen.queryByRole("button", { name: /CONFIRM & ASSIGN/i })).toBeNull();
     });
   });
+
+  it("links to the agenda editor", () => {
+    render(
+      <AdminScreen event={julyEvent} items={julyAgenda} user={user} signOutAction={noop} submissions={[]} {...emptyAssignments} />,
+    );
+
+    expect(screen.getByRole("link", { name: /EDIT AGENDA/ })).toHaveAttribute(
+      "href",
+      "/events/july-2026/admin/agenda",
+    );
+  });
 });

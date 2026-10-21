@@ -23,6 +23,7 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
 | `/events/[slug]/my-pitches` | signed-in | Your own submissions for that event |
 | `/events/[slug]/attendees` | signed-in | RSVP + who's coming |
 | `/events/[slug]/admin` | organisers only | All submissions, assign talks to agenda slots |
+| `/events/[slug]/admin/agenda` | organisers only | Edit the event's details and its agenda items |
 
 The pre-multi-event URLs (`/agenda`, `/pitch`, `/my-pitches`, `/attendees`, `/admin`) redirect to the same page on the current event: the next upcoming one, or the most recent if none are upcoming.
 
@@ -104,8 +105,8 @@ feday_design_specs/  the original design prototype (reference only — not shipp
 
 ## Notes & current limitations
 
-- Event details and the agenda live in the `events` and `agenda_items` tables. Organisers can create events at `/events/new`. There's no agenda editor yet, so change agenda items with SQL. The app shows the next upcoming event, or the most recent one if none are upcoming.
-- Talk-type durations (lightning 10 / talk 30 min) follow the agenda's slot lengths. Workshop slots are no longer offered.
+- Event details and the agenda live in the `events` and `agenda_items` tables. Organisers create events at `/events/new` and edit an event's details and agenda at `/events/[slug]/admin/agenda`. A slot with a talk assigned can be retimed or renamed, but it can't be deleted or change type until the talk is unassigned. The app shows the next upcoming event, or the most recent one if none are upcoming.
+- Talk types and their advertised lengths (lightning 10 / talk 30 min) are fixed in [`src/lib/feday-data.ts`](src/lib/feday-data.ts); slot times on each agenda are up to organisers. Workshop items can go on an agenda, but nobody can pitch for them.
 - Read screens show an empty state when there's no data; a transient read error currently also
   surfaces as "empty" (no dedicated error UI yet).
 - Deployment isn't configured yet — it's a local-first build. On a host (e.g. Vercel), set the
