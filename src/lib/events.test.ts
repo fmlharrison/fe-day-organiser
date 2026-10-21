@@ -7,6 +7,9 @@ import {
   formatEventTimeRange,
   isEventPast,
   todayInLondon,
+  trimEventInput,
+  validateEventInput,
+  type EventInput,
 } from "@/lib/events";
 import { julyEvent } from "@/test/fixtures";
 
@@ -62,5 +65,66 @@ describe("todayInLondon", () => {
   it("matches UTC during GMT", () => {
     expect(todayInLondon(new Date("2026-12-01T23:59:00Z"))).toBe("2026-12-01");
     expect(todayInLondon(new Date("2026-12-02T00:00:00Z"))).toBe("2026-12-02");
+  });
+});
+
+describe("validateEventInput", () => {
+  const valid: EventInput = {
+    slug: "december-2026",
+    title: "FE DAY",
+    tagline: "INSERT COIN — SHARE WHAT YOU KNOW",
+    eventDate: "2026-12-01",
+    startTime: "10:00",
+    endTime: "16:00",
+    location: "LION'S SHARE + REMOTE",
+  };
+
+  it("accepts a complete event", () => {
+    expect(validateEventInput(valid)).toEqual({});
+  });
+
+  it.each([
+    ["", "Give the event a URL slug."],
+    ["December 2026", "Use lowercase letters, numbers and single hyphens, e.g. december-2026."],
+    ["december--2026", "Use lowercase letters, numbers and single hyphens, e.g. december-2026."],
+    ["-december", "Use lowercase letters, numbers and single hyphens, e.g. december-2026."],
+    ["new", "That slug is reserved. Pick another."],
+  ])("rejects the slug %j", (slug, message) => {
+    expect(validateEventInput({ ...valid, slug }).slug).toBe(message);
+  });
+
+  it("requires a title, date, times and location", () => {
+    const errors = validateEventInput({
+      ...valid,
+      title: "",
+      eventDate: "",
+      startTime: "",
+      endTime: "",
+      location: "",
+    });
+    expect(Object.keys(errors).sort()).toEqual(["endTime", "eventDate", "location", "startTime", "title"]);
+  });
+
+  it("rejects an impossible date", () => {
+    expect(validateEventInput({ ...valid, eventDate: "2026-02-30" }).eventDate).toBeDefined();
+  });
+
+  it("requires the event to end after it starts", () => {
+    expect(validateEventInput({ ...valid, startTime: "16:00", endTime: "10:00" }).endTime).toBe(
+      "The event has to end after it starts.",
+    );
+    expect(validateEventInput({ ...valid, startTime: "10:00", endTime: "10:00" }).endTime).toBeDefined();
+  });
+
+  it("allows an empty tagline but caps its length", () => {
+    expect(validateEventInput({ ...valid, tagline: "" })).toEqual({});
+    expect(validateEventInput({ ...valid, tagline: "x".repeat(121) }).tagline).toBeDefined();
+  });
+
+  it("trims every field", () => {
+    expect(trimEventInput({ ...valid, slug: "  december-2026 ", location: " Lion's Share " })).toMatchObject({
+      slug: "december-2026",
+      location: "Lion's Share",
+    });
   });
 });

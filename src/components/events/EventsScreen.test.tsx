@@ -55,4 +55,23 @@ describe("EventsScreen", () => {
 
     expect(screen.queryByRole("heading", { name: "PAST" })).toBeNull();
   });
+
+  it("offers organisers a way to create an event", () => {
+    const { rerender } = render(
+      <EventsScreen currentEvent={julyEvent} events={[julyEvent]} today="2026-10-15" user={user} signOutAction={noop} />,
+    );
+    expect(screen.queryByRole("link", { name: "+ NEW EVENT" })).toBeNull();
+
+    rerender(
+      <EventsScreen
+        currentEvent={julyEvent}
+        events={[julyEvent]}
+        today="2026-10-15"
+        user={user}
+        isOrganiser
+        signOutAction={noop}
+      />,
+    );
+    expect(screen.getByRole("link", { name: "+ NEW EVENT" })).toHaveAttribute("href", "/events/new");
+  });
 });
