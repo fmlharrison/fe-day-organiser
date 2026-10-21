@@ -1,4 +1,4 @@
-import type { AgendaKind } from "@/lib/feday-data";
+import { KIND_META, type AgendaKind } from "@/lib/feday-data";
 
 export type EventRecord = {
   id: string;
@@ -147,5 +147,76 @@ export function validateEventInput(input: EventInput): EventValidationErrors {
 }
 
 export function isEventInputValid(errors: EventValidationErrors): boolean {
+  return Object.keys(errors).length === 0;
+}
+
+export type EventFormValues = EventInput & {
+  /** Event whose agenda to copy, or "" to start with an empty agenda. */
+  copyAgendaFromEventId: string;
+};
+
+export type EventFormResult =
+  | { ok: true }
+  | { ok: false; errors: EventValidationErrors; formError?: string };
+
+export type AgendaItemInput = {
+  startTime: string;
+  endTime: string;
+  kind: string;
+  title: string;
+  description: string;
+};
+
+export type AgendaItemValidationErrors = Partial<Record<keyof AgendaItemInput, string>>;
+
+export type AgendaItemResult =
+  | { ok: true }
+  | { ok: false; errors: AgendaItemValidationErrors; formError?: string };
+
+export function isAgendaKind(value: string): value is AgendaKind {
+  return Object.prototype.hasOwnProperty.call(KIND_META, value);
+}
+
+export function trimAgendaItemInput(input: AgendaItemInput): AgendaItemInput {
+  return {
+    startTime: input.startTime.trim(),
+    endTime: input.endTime.trim(),
+    kind: input.kind.trim(),
+    title: input.title.trim(),
+    description: input.description.trim(),
+  };
+}
+
+// Mirrors the check constraints on public.agenda_items (migration 0006).
+export function validateAgendaItemInput(input: AgendaItemInput): AgendaItemValidationErrors {
+  const errors: AgendaItemValidationErrors = {};
+
+  if (!TIME_PATTERN.test(input.startTime)) {
+    errors.startTime = "Pick a start time.";
+  }
+  if (!TIME_PATTERN.test(input.endTime)) {
+    errors.endTime = "Pick an end time.";
+  } else if (TIME_PATTERN.test(input.startTime) && input.endTime <= input.startTime) {
+    errors.endTime = "It has to end after it starts.";
+  }
+
+  if (!isAgendaKind(input.kind)) {
+    errors.kind = "Pick what kind of item this is.";
+  }
+
+  if (!input.title) {
+    errors.title = "Give it a title.";
+  } else if (input.title.length > 70) {
+    errors.title = "Keep the title under 70 characters.";
+  }
+
+  if (input.description.length > 400) {
+    errors.description = "Keep the description under 400 characters.";
+  }
+
+  return errors;
+}
+
+export function isAgendaItemInputValid(errors: AgendaItemValidationErrors): boolean {
   return Object.keys(errors).length === 0;
 }

@@ -8,6 +8,7 @@ import {
   isEventPast,
   todayInLondon,
   trimEventInput,
+  validateAgendaItemInput,
   validateEventInput,
   type EventInput,
 } from "@/lib/events";
@@ -126,5 +127,28 @@ describe("validateEventInput", () => {
       slug: "december-2026",
       location: "Lion's Share",
     });
+  });
+});
+
+describe("validateAgendaItemInput", () => {
+  const valid = { startTime: "11:20", endTime: "11:50", kind: "talk", title: "Talk Slot #1", description: "" };
+
+  it("accepts a complete item with an empty description", () => {
+    expect(validateAgendaItemInput(valid)).toEqual({});
+  });
+
+  it("rejects an unknown kind", () => {
+    expect(validateAgendaItemInput({ ...valid, kind: "party" }).kind).toBeDefined();
+  });
+
+  it("requires a title and the end to come after the start", () => {
+    const errors = validateAgendaItemInput({ ...valid, title: "", endTime: "11:00" });
+    expect(errors.title).toBe("Give it a title.");
+    expect(errors.endTime).toBe("It has to end after it starts.");
+  });
+
+  it("caps the title and description lengths", () => {
+    const errors = validateAgendaItemInput({ ...valid, title: "x".repeat(71), description: "x".repeat(401) });
+    expect(Object.keys(errors).sort()).toEqual(["description", "title"]);
   });
 });

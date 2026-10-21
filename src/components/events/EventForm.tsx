@@ -4,21 +4,27 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Btn } from "@/components/ui/Btn";
 import { PixelFrame } from "@/components/ui/PixelFrame";
-import type { CreateEventResult, NewEventInput } from "@/app/events/new/actions";
 import {
   eventEdition,
   isEventInputValid,
   trimEventInput,
   validateEventInput,
+  type EventFormResult,
+  type EventFormValues,
   type EventInput,
   type EventRecord,
   type EventValidationErrors,
 } from "@/lib/events";
 
 type EventFormProps = {
-  /** Existing events, newest first. The first one seeds the form's defaults. */
-  copySources: EventRecord[];
-  createAction: (input: NewEventInput) => Promise<CreateEventResult>;
+  initialValues: EventFormValues;
+  /** When given, offers copying one of these events' agendas. */
+  copySources?: EventRecord[];
+  /** An event's slug is part of its links, so it can't change once created. */
+  slugLocked?: boolean;
+  submitLabel: string;
+  cancelHref: string;
+  submitAction: (input: EventFormValues) => Promise<EventFormResult>;
 };
 
 type TextField = {
@@ -50,24 +56,24 @@ const FIELDS: TextField[][] = [
   [{ key: "location", label: "WHERE *", placeholder: "LION'S SHARE + REMOTE", maxLength: 60 }],
 ];
 
-export function EventForm({ copySources, createAction }: EventFormProps) {
-  const latest = copySources[0];
-  const [form, setForm] = useState<NewEventInput>({
-    slug: "",
-    title: latest?.title ?? "FE DAY",
-    tagline: latest?.tagline ?? "",
-    eventDate: "",
-    startTime: latest?.startTime ?? "10:00",
-    endTime: latest?.endTime ?? "16:00",
-    location: latest?.location ?? "",
-    copyAgendaFromEventId: latest?.id ?? "",
-  });
+export function EventForm({
+  initialValues,
+  copySources,
+  slugLocked = false,
+  submitLabel,
+  cancelHref,
+  submitAction,
+}: EventFormProps) {
+  const [form, setForm] = useState<EventFormValues>(initialValues);
   const [errors, setErrors] = useState<EventValidationErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const set = <K extends keyof NewEventInput>(key: K, value: NewEventInput[K]) =>
+  const set = <K extends keyof EventFormValues>(key: K, value: EventFormValues[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
+    setSaved(false);
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -81,33 +87,18 @@ export function EventForm({ copySources, createAction }: EventFormProps) {
     setErrors({});
     setFormError(null);
     setSubmitting(true);
-    // On success the action redirects, so only failures come back here.
-    const result = await createAction(form);
-    setErrors(result.errors);
-    setFormError(result.formError ?? null);
+    const result = await submitAction(form);
+    if (result.ok) {
+      setSaved(true);
+    } else {
+      setErrors(result.errors);
+      setFormError(result.formError ?? null);
+    }
     setSubmitting(false);
   };
 
   return (
     <div>
-      <Link
-        href="/events"
-        className="pixel"
-        style={{ display: "inline-block", color: "var(--teal)", fontSize: 11, marginBottom: 16 }}
-      >
-        {"<"} ALL EVENTS
-      </Link>
-      <h1
-        style={{
-          fontSize: "clamp(24px,5vw,38px)",
-          color: "var(--gold)",
-          textShadow: "4px 4px 0 var(--shadow)",
-          marginBottom: 26,
-        }}
-      >
-        NEW EVENT
-      </h1>
-
       <form onSubmit={handleSubmit} noValidate>
         <PixelFrame surface="var(--bg-2)" pad={26}>
           <div className="stack" style={{ gap: 20 }}>
@@ -126,11 +117,13 @@ export function EventForm({ copySources, createAction }: EventFormProps) {
                       maxLength={field.maxLength}
                       placeholder={field.placeholder}
                       value={form[field.key]}
-                      disabled={submitting}
+                      disabled={submitting || (field.key === "slug" && slugLocked)}
                       aria-invalid={Boolean(errors[field.key])}
                       onChange={(e) => set(field.key, e.target.value)}
                     />
-                    {field.hint && <div className="txt-sm">{field.hint}</div>}
+                    {field.hint && !(field.key === "slug" && slugLocked) && (
+                      <div className="txt-sm">{field.hint}</div>
+                    )}
                     {errors[field.key] && (
                       <div role="alert" className="txt-sm" style={{ color: "var(--orange)" }}>
                         {errors[field.key]}
@@ -141,6 +134,7 @@ export function EventForm({ copySources, createAction }: EventFormProps) {
               </div>
             ))}
 
+            {copySources && (
             <div className="field">
               <label htmlFor="event-copy-agenda">COPY AGENDA FROM</label>
               <select
@@ -161,20 +155,26 @@ export function EventForm({ copySources, createAction }: EventFormProps) {
                 Copies every session, break and talk slot. Talks assigned to that event aren&apos;t copied.
               </div>
             </div>
+            )}
           </div>
         </PixelFrame>
 
         <div className="row between" style={{ gap: 16, marginTop: 30, flexWrap: "wrap" }}>
-          <Link href="/events" className="btn ghost">
+          <Link href={cancelHref} className="btn ghost">
             CANCEL
           </Link>
+          {saved && (
+            <div role="status" className="txt-sm" style={{ color: "var(--teal)" }}>
+              Saved.
+            </div>
+          )}
           {formError && (
             <div role="alert" className="txt-sm" style={{ color: "var(--orange)" }}>
               {formError}
             </div>
           )}
           <Btn variant="orange lg" type="submit" disabled={submitting}>
-            {submitting ? "CREATING…" : "CREATE EVENT >"}
+            {submitting ? "SAVING…" : `${submitLabel} >`}
           </Btn>
         </div>
       </form>

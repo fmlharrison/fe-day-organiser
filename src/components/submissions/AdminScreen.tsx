@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { TopBar } from "@/components/agenda/TopBar";
 import { AdminAttendanceList } from "@/components/submissions/AdminAttendanceList";
 import { AdminSubmissionList } from "@/components/submissions/AdminSubmissionList";
@@ -7,6 +8,7 @@ import type { AttendanceCounts, AttendanceRecord } from "@/lib/attendance";
 import type { TalkSubmissionRow } from "@/lib/submissions";
 import type { AgendaItem, EventRecord } from "@/lib/events";
 import { getOpenSlots, getRemainingOpenSlotCount } from "@/lib/agenda";
+import { eventPath } from "@/lib/routes";
 
 type AdminScreenProps = {
   event: EventRecord;
@@ -41,9 +43,14 @@ export function AdminScreen({
         <div className="pixel" style={{ fontSize: 10, color: "var(--teal)", marginBottom: 12 }}>
           ORGANISER
         </div>
-        <h1 style={{ fontSize: "clamp(26px,5vw,42px)", color: "var(--gold)", textShadow: "4px 4px 0 var(--shadow)", marginBottom: 12 }}>
-          ALL PITCHES
-        </h1>
+        <div className="row between" style={{ gap: 18, flexWrap: "wrap", marginBottom: 12 }}>
+          <h1 style={{ fontSize: "clamp(26px,5vw,42px)", color: "var(--gold)", textShadow: "4px 4px 0 var(--shadow)" }}>
+            ALL PITCHES
+          </h1>
+          <Link href={eventPath(event.slug, "admin/agenda")} className="btn orange">
+            EDIT AGENDA {">"}
+          </Link>
+        </div>
         <div className="txt-sm" style={{ marginBottom: 26 }}>
           {submissions.length} submitted · {assignedCount} on the agenda · {remainingOpen} open slots left
         </div>

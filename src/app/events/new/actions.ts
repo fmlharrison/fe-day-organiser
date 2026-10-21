@@ -7,28 +7,17 @@ import {
   isEventInputValid,
   trimEventInput,
   validateEventInput,
-  type EventInput,
-  type EventValidationErrors,
+  type EventFormResult,
+  type EventFormValues,
 } from "@/lib/events";
 import { getAgendaItems } from "@/lib/events.server";
 import { eventPath } from "@/lib/routes";
 import { isOrganiser } from "@/lib/submissions";
 import { createClient } from "@/lib/supabase/server";
 
-export type NewEventInput = EventInput & {
-  /** Event whose agenda to copy, or "" to start with an empty agenda. */
-  copyAgendaFromEventId: string;
-};
-
-export type CreateEventResult = {
-  ok: false;
-  errors: EventValidationErrors;
-  formError?: string;
-};
-
 const UNIQUE_VIOLATION = "23505";
 
-export async function createEvent(input: NewEventInput): Promise<CreateEventResult> {
+export async function createEvent(input: EventFormValues): Promise<EventFormResult> {
   if (!(await isOrganiser())) {
     return { ok: false, errors: {}, formError: "Only organisers can create events." };
   }

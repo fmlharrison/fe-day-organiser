@@ -23,10 +23,11 @@ vi.mock("@/lib/auth/user", () => ({ getSessionUser: mocks.getSessionUser }));
 vi.mock("@/lib/submissions", () => ({ isOrganiser: mocks.isOrganiser }));
 vi.mock("@/lib/events.server", () => ({ getAgendaItems: mocks.getAgendaItems }));
 
-import { createEvent, type NewEventInput } from "@/app/events/new/actions";
+import { createEvent } from "@/app/events/new/actions";
+import type { EventFormValues } from "@/lib/events";
 import { julyAgenda, julyEvent } from "@/test/fixtures";
 
-const input: NewEventInput = {
+const input: EventFormValues = {
   slug: "december-2026",
   title: "FE DAY",
   tagline: "INSERT COIN — SHARE WHAT YOU KNOW",
@@ -95,8 +96,7 @@ describe("createEvent", () => {
 
     const result = await createEvent(input);
 
-    expect(result).toMatchObject({ ok: false, errors: {} });
-    expect(result.formError).toMatch(/Couldn't copy the agenda/);
+    expect(result).toMatchObject({ ok: false, errors: {}, formError: expect.stringMatching(/Couldn't copy the agenda/) });
     expect(mocks.deleteEq).toHaveBeenCalledWith("id", "event-dec-2026");
     expect(mocks.redirect).not.toHaveBeenCalled();
   });
@@ -113,7 +113,7 @@ describe("createEvent", () => {
   it("returns validation errors without touching the database", async () => {
     const result = await createEvent({ ...input, slug: "Not A Slug" });
 
-    expect(result.errors.slug).toBeDefined();
+    expect(result).toMatchObject({ ok: false, errors: { slug: expect.any(String) } });
     expect(mocks.createClient).not.toHaveBeenCalled();
   });
 
@@ -122,7 +122,7 @@ describe("createEvent", () => {
 
     const result = await createEvent(input);
 
-    expect(result.formError).toBe("Only organisers can create events.");
+    expect(result).toMatchObject({ ok: false, formError: "Only organisers can create events." });
     expect(mocks.createClient).not.toHaveBeenCalled();
   });
 });
