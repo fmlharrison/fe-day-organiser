@@ -16,6 +16,7 @@ agenda and lets chapter members **pitch a talk**. Themed as a retro 8-bit arcade
 |---|---|---|
 | `/` | public | Landing for the current event + "Sign in with Google" |
 | `/events` | signed-in | Every event, upcoming and past |
+| `/events/new` | organisers only | Create an event, optionally copying another event's agenda |
 | `/events/[slug]/agenda` | signed-in | That event's running order |
 | `/events/[slug]/agenda/[submissionId]/feedback` | signed-in | Rate an assigned talk and update your own feedback |
 | `/events/[slug]/pitch` | signed-in | Pitch a talk (open agenda slots deep-link here via `?type=`) |
@@ -103,7 +104,7 @@ feday_design_specs/  the original design prototype (reference only — not shipp
 
 ## Notes & current limitations
 
-- Event details and the agenda live in the `events` and `agenda_items` tables. There's no editor UI yet, so change them with SQL. The app shows the next upcoming event, or the most recent one if none are upcoming.
+- Event details and the agenda live in the `events` and `agenda_items` tables. Organisers can create events at `/events/new`. There's no agenda editor yet, so change agenda items with SQL. The app shows the next upcoming event, or the most recent one if none are upcoming.
 - Talk-type durations (lightning 10 / talk 30 min) follow the agenda's slot lengths. Workshop slots are no longer offered.
 - Read screens show an empty state when there's no data; a transient read error currently also
   surfaces as "empty" (no dedicated error UI yet).

@@ -63,16 +63,22 @@ export function EventsScreen({
     <div>
       <TopBar event={currentEvent} user={user} isOrganiser={isOrganiser} signOutAction={signOutAction} />
       <div className="wrap">
-        <h1
-          style={{
-            fontSize: "clamp(26px,5vw,42px)",
-            color: "var(--gold)",
-            textShadow: "4px 4px 0 var(--shadow)",
-            marginBottom: 26,
-          }}
-        >
-          ALL EVENTS
-        </h1>
+        <div className="row between" style={{ gap: 18, flexWrap: "wrap", marginBottom: 26 }}>
+          <h1
+            style={{
+              fontSize: "clamp(26px,5vw,42px)",
+              color: "var(--gold)",
+              textShadow: "4px 4px 0 var(--shadow)",
+            }}
+          >
+            ALL EVENTS
+          </h1>
+          {isOrganiser && (
+            <Link href="/events/new" className="btn orange">
+              + NEW EVENT
+            </Link>
+          )}
+        </div>
         <EventSection title="UPCOMING" events={upcoming} />
         <EventSection title="PAST" events={past} />
       </div>
